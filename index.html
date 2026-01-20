@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>天马园区 | 综合人力排班决策模型</title
+    <title>天马园区 | 综合人力排班决策模型</title>
     <meta name="robots" content="noindex, nofollow">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -114,7 +114,7 @@
 
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         
-        /* 底部图表 (修复显示不全的核心代码) */
+        /* 底部图表 */
         .chart-container { background: white; padding: 25px; border-radius: 8px; margin-top: 20px; border: 1px solid var(--border-color); }
         .chart-row { display: flex; align-items: center; margin-bottom: 10px; font-size: 13px; }
         
@@ -125,14 +125,14 @@
         .chart-bar-area { flex: 1; background: #f0f0f0; height: 24px; border-radius: 4px; overflow: hidden; }
         .chart-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; color: white; font-size: 12px; white-space: nowrap;}
         
-        /* 数值显示区域 (修复重点：加宽、防止压缩) */
+        /* 数值显示区域 */
         .chart-val { 
-            width: 120px;         /* 加宽到120px */
+            width: 120px;         
             padding-left: 10px; 
             font-weight: bold; 
             color: #333; 
-            flex-shrink: 0;       /* 绝不许被压缩 */
-            text-align: left;     /* 靠左对齐 */
+            flex-shrink: 0;       
+            text-align: left;     
         }
 
         .hidden { display: none !important; }
@@ -196,12 +196,25 @@
         <input type="range" id="eff" min="0.1" max="1.0" step="0.05" value="1.0" oninput="update()">
         <label>OEE (有效作业率) <span id="disp_oee" style="float:right; font-weight:bold;">1.00</span></label>
         <input type="range" id="oee" min="0.1" max="1.0" step="0.05" value="1.0" oninput="update()">
-        <label>班次时长</label>
-        <select id="shift" onchange="update()">
-            <option value="8">8 小时/班</option>
-            <option value="12">12 小时/班</option>
-        </select>
+        
+        <div id="shift-group-roche" class="hidden">
+            <label>⏱️ 班次时长 (罗诊专属)</label>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                <span style="font-size:12px; color:#666; line-height:28px;">❄️冷链:</span>
+                <input type="number" id="shift_roche_cold" value="8" min="1" max="24" step="0.5" oninput="update()" style="width:60px; text-align:right;">
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <span style="font-size:12px; color:#666; line-height:28px;">☀️常温:</span>
+                <input type="number" id="shift_roche_amb" value="8" min="1" max="24" step="0.5" oninput="update()" style="width:60px; text-align:right;">
+            </div>
+        </div>
 
+        <div id="shift-group-generic">
+            <label>⏱️ 班次时长 (通用)</label>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <input type="number" id="shift_generic" value="8" min="1" max="24" step="0.5" oninput="update()" style="font-size:14px; font-weight:bold; color:var(--device-green);">
+            </div>
+        </div>
         <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
             <h3>👥 正式工出勤计算</h3>
             <div id="formal-roche">
@@ -297,8 +310,8 @@
 
         <div id="view-roche" class="columns view-roche">
             <div class="col">
-                <div style="background:var(--roche-blue); color:white; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold;">❄️ 罗氏冷链组</div>
-                <div class="card"><div class="card-header-cold"><h4>📦 罗氏冷链 (主营)</h4></div><div class="input-grid">
+                <div style="background:var(--roche-blue); color:white; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold;">❄️ 罗诊冷链组</div>
+                <div class="card"><div class="card-header-cold"><h4>📦 罗诊冷链 (主营)</h4></div><div class="input-grid">
                     <div class="input-item"><label>收货翻托/全检 (托)</label><input type="number" class="data-input" data-uph="2.5" id="c_ft"></div>
                     <div class="input-item"><label>收货上架 (条)</label><input type="number" class="data-input" data-uph="20" id="c_sj"></div>
                     <div class="input-item"><label>发货拣货 (条)</label><input type="number" class="data-input" data-uph="20" id="c_jh"></div>
@@ -326,7 +339,7 @@
             </div>
             
             <div class="col">
-                <div style="background:var(--roche-sand); color:#5D5046; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold;">☀️ 罗氏常温组</div>
+                <div style="background:var(--roche-sand); color:#5D5046; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold;">☀️ 罗诊常温组</div>
                 <div class="card"><div class="card-header-amb"><h4>🧪 罗氏试剂</h4></div><div class="input-grid">
                     <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="r_sj"></div>
                     <div class="input-item"><label>取货 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="r_qh"></div>
@@ -445,6 +458,32 @@
         currentProject = select.value;
         const pageTitle = document.getElementById('page-title');
 
+        // ★★★ 核心修复点：这里控制谁显示、谁隐藏 ★★★
+        const groupRoche = document.getElementById('shift-group-roche');
+        const groupGeneric = document.getElementById('shift-group-generic');
+
+        if (currentProject === 'roche') {
+            // 如果是罗诊：显示罗诊组，隐藏通用组
+            if(groupRoche) groupRoche.classList.remove('hidden');
+            if(groupGeneric) groupGeneric.classList.add('hidden');
+            
+            pageTitle.innerText = "罗诊项目人力排班决策模型";
+            select.style.backgroundColor = "var(--roche-blue)";
+        } else {
+            // 如果是其他：隐藏罗诊组，显示通用组
+            if(groupRoche) groupRoche.classList.add('hidden');
+            if(groupGeneric) groupGeneric.classList.remove('hidden');
+
+            if (currentProject === 'device') {
+                pageTitle.innerText = "器械项目人力排班决策模型";
+                select.style.backgroundColor = "var(--device-green)";
+            } else {
+                pageTitle.innerText = "药品项目人力排班决策模型";
+                select.style.backgroundColor = "var(--medicine-purple)";
+            }
+        }
+
+        // 下面是原本控制卡片显示的逻辑
         document.getElementById('view-roche').classList.add('hidden');
         document.getElementById('view-device').classList.add('hidden');
         document.getElementById('view-medicine').classList.add('hidden');
@@ -462,27 +501,21 @@
             document.getElementById('formal-roche').classList.remove('hidden');
             document.getElementById('dash-roche-group').classList.remove('hidden');
             document.getElementById('dash-roche-group').style.display = 'flex'; 
-            pageTitle.innerText = "罗诊项目人力排班决策模型";
-            select.style.backgroundColor = "var(--roche-blue)";
         } else if (currentProject === 'device') {
             document.getElementById('view-device').classList.remove('hidden');
             document.getElementById('formal-device').classList.remove('hidden');
             document.getElementById('dash-device-group').classList.remove('hidden');
             document.getElementById('dash-device-group').style.display = 'flex';
-            pageTitle.innerText = "器械项目人力排班决策模型";
-            select.style.backgroundColor = "var(--device-green)";
         } else if (currentProject === 'medicine') {
             document.getElementById('view-medicine').classList.remove('hidden');
             document.getElementById('formal-medicine').classList.remove('hidden');
             document.getElementById('dash-medicine-group').classList.remove('hidden');
             document.getElementById('dash-medicine-group').style.display = 'flex';
-            pageTitle.innerText = "药品项目人力排班决策模型";
-            select.style.backgroundColor = "var(--medicine-purple)";
         }
         update(); 
     }
 
-function init() {
+    function init() {
         // 获取网址里的参数
         const params = new URLSearchParams(window.location.search);
 
@@ -513,17 +546,35 @@ function init() {
 
         const eff = parseFloat(document.getElementById('eff').value);
         const oee = parseFloat(document.getElementById('oee').value);
-        const shift = parseInt(document.getElementById('shift').value);
+        
+        // ★ 改动1：不再读取单一的 shift，而是准备好变量
+        let shiftCold = 8, shiftAmb = 8, shiftGen = 8;
+        
+        // 读取数值
+        shiftCold = parseFloat(document.getElementById('shift_roche_cold').value) || 8;
+        shiftAmb = parseFloat(document.getElementById('shift_roche_amb').value) || 8;
+        shiftGen = parseFloat(document.getElementById('shift_generic').value) || 8;
 
         document.getElementById('disp_eff').innerText = eff.toFixed(2);
         document.getElementById('disp_oee').innerText = oee.toFixed(2);
-        document.getElementById('res_shift').innerText = shift;
+        
+        // 显示班次时长（如果是罗诊，显示 "8/10"，否则显示 "8"）
+        if(currentProject === 'roche') {
+             document.getElementById('res_shift').innerText = shiftCold === shiftAmb ? shiftCold : `❄️${shiftCold}/☀️${shiftAmb}`;
+        } else {
+             document.getElementById('res_shift').innerText = shiftGen;
+        }
 
         let totalNeed = 0;
         let chartData = [];
-        const tempCapPerPerson = shift * oee * eff;
+        
+        // ★ 改动2：不再计算全局 tempCapPerPerson，改为各项目内部计算
 
         if (currentProject === 'roche') {
+            // 定义各自的人效
+            const capCold = shiftCold * oee * eff; // 冷链单人产能
+            const capAmb = shiftAmb * oee * eff;   // 常温单人产能
+
             const fcCold = parseInt(document.getElementById('fc_roche_cold').value) || 0;
             const fcAmb = parseInt(document.getElementById('fc_roche_amb').value) || 0;
             let hoursCold = 0, hoursAmb = 0;
@@ -539,14 +590,23 @@ function init() {
                     const fullName = groupTitle ? `${groupTitle}-${label}` : label;
 
                     if(isAmb) hoursAmb += hours; else hoursCold += hours;
-                    chartData.push({ name: fullName, hours: hours, people: hours / tempCapPerPerson, color: isAmb ? 'var(--roche-sand)' : 'var(--roche-blue)' });
+                    
+                    // ★ 图表里的人力计算也要区分班次
+                    chartData.push({ 
+                        name: fullName, 
+                        hours: hours, 
+                        people: hours / (isAmb ? capAmb : capCold), // 这里区分了除数
+                        color: isAmb ? 'var(--roche-sand)' : 'var(--roche-blue)' 
+                    });
                 }
             });
 
-            const gapCold = Math.max(0, (hoursCold / oee) - (fcCold * shift));
-            const gapAmb = Math.max(0, (hoursAmb / oee) - (fcAmb * shift));
-            const needCold = Math.ceil(gapCold / tempCapPerPerson);
-            const needAmb = Math.ceil(gapAmb / tempCapPerPerson);
+            // ★ 计算缺口时，分别乘以各自的班次时长
+            const gapCold = Math.max(0, (hoursCold / oee) - (fcCold * shiftCold));
+            const gapAmb = Math.max(0, (hoursAmb / oee) - (fcAmb * shiftAmb));
+            
+            const needCold = Math.ceil(gapCold / capCold);
+            const needAmb = Math.ceil(gapAmb / capAmb);
 
             document.getElementById('res_roche_cold').innerText = needCold + " 人";
             document.getElementById('gap_roche_cold').innerText = gapCold.toFixed(1);
@@ -555,6 +615,7 @@ function init() {
             totalNeed = needCold + needAmb;
 
         } else if (currentProject === 'device') {
+            const capGen = shiftGen * oee * eff; // 通用产能
             const fc = parseInt(document.getElementById('fc_device').value) || 0;
             let totalHours = 0;
             document.querySelectorAll('#view-device .data-input').forEach(input => {
@@ -566,16 +627,17 @@ function init() {
                     const groupTitle = input.closest('.card').querySelector('h4').innerText.split(' ')[1] || "";
                     const fullName = `${groupTitle}-${label}`;
                     totalHours += hours;
-                    chartData.push({ name: fullName, hours: hours, people: hours / tempCapPerPerson, color: 'var(--device-green)' });
+                    chartData.push({ name: fullName, hours: hours, people: hours / capGen, color: 'var(--device-green)' });
                 }
             });
-            const gap = Math.max(0, (totalHours / oee) - (fc * shift));
-            const need = Math.ceil(gap / tempCapPerPerson);
+            const gap = Math.max(0, (totalHours / oee) - (fc * shiftGen)); // 使用通用班次
+            const need = Math.ceil(gap / capGen);
             document.getElementById('res_device').innerText = need + " 人";
             document.getElementById('gap_device').innerText = gap.toFixed(1);
             totalNeed = need;
 
         } else if (currentProject === 'medicine') {
+            const capGen = shiftGen * oee * eff; // 通用产能
             const fc = parseInt(document.getElementById('fc_medicine').value) || 0;
             let totalHours = 0;
             document.querySelectorAll('#view-medicine .data-input').forEach(input => {
@@ -587,11 +649,11 @@ function init() {
                     const groupTitle = input.closest('.card').querySelector('h4').innerText.split(' ')[1] || "";
                     const fullName = `${groupTitle}-${label}`;
                     totalHours += hours;
-                    chartData.push({ name: fullName, hours: hours, people: hours / tempCapPerPerson, color: 'var(--medicine-purple)' });
+                    chartData.push({ name: fullName, hours: hours, people: hours / capGen, color: 'var(--medicine-purple)' });
                 }
             });
-            const gap = Math.max(0, (totalHours / oee) - (fc * shift));
-            const need = Math.ceil(gap / tempCapPerPerson);
+            const gap = Math.max(0, (totalHours / oee) - (fc * shiftGen)); // 使用通用班次
+            const need = Math.ceil(gap / capGen);
             document.getElementById('res_medicine').innerText = need + " 人";
             document.getElementById('gap_medicine').innerText = gap.toFixed(1);
             totalNeed = need;
@@ -650,7 +712,10 @@ function init() {
         } else {
             html += `<div class="pdf-kpi-card" style="background:var(--medicine-purple)"><div class="pdf-kpi-title">🌿 药品需求</div><div class="pdf-kpi-val">${document.getElementById('res_medicine').innerText}</div><div class="pdf-kpi-sub">缺口工时: ${document.getElementById('gap_medicine').innerText} H</div></div>`;
         }
-        html += `<div class="pdf-kpi-card" style="background:#e74c3c"><div class="pdf-kpi-title">🏆 今日总需求</div><div class="pdf-kpi-val">${document.getElementById('res_total').innerText}</div><div class="pdf-kpi-sub">班次时长: ${document.getElementById('shift').value} H</div></div>`;
+        
+        // ★★★ PDF 班次显示修复：不再取value，而是取innerText ★★★
+        const shiftDisplay = document.getElementById('res_shift').innerText;
+        html += `<div class="pdf-kpi-card" style="background:#e74c3c"><div class="pdf-kpi-title">🏆 今日总需求</div><div class="pdf-kpi-val">${document.getElementById('res_total').innerText}</div><div class="pdf-kpi-sub">班次时长: ${shiftDisplay} H</div></div>`;
         html += `</div>`;
 
         let staffInfo = "";
@@ -739,7 +804,4 @@ function init() {
 </script>
 
 </body>
-
 </html>
-
-
