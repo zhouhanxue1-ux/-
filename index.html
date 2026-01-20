@@ -481,15 +481,28 @@
         update(); 
     }
 
-    function init() {
+function init() {
+        // 获取网址里的参数
+        const params = new URLSearchParams(window.location.search);
+
         document.querySelectorAll('input, select').forEach(el => {
+            // 1. 先尝试从 LocalStorage 读取 (仅限 base_ 开头的正式工在册人数)
             if (el.id && el.id.startsWith('base_')) {
                 const stored = localStorage.getItem(el.id);
                 if (stored) el.value = stored;
             }
+
+            // 2. ★★★ 修复核心：如果网址里带了数据，强制覆盖填入框内 ★★★
+            if (el.id && params.has(el.id)) {
+                el.value = params.get(el.id);
+            }
         });
-        const params = new URLSearchParams(window.location.search);
-        if(params.has('project-select')) document.getElementById('project-select').value = params.get('project-select');
+        
+        // 3. 确保切换到正确的项目视图
+        if(params.has('project-select')){
+            document.getElementById('project-select').value = params.get('project-select');
+        }
+        
         switchView(); 
     }
 
@@ -727,3 +740,4 @@
 </body>
 
 </html>
+
