@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>天马园区 | 综合人力排班决策模型</title>
     <meta name="robots" content="noindex, nofollow">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     
     <style>
         :root {
@@ -50,7 +52,6 @@
         .sidebar::-webkit-scrollbar { width: 6px; }
         .sidebar::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 3px; }
 
-        /* 主内容区 */
         .main-content {
             flex: 1;
             display: flex;
@@ -78,7 +79,8 @@
             font-size: 13px;
         }
         
-        .input-readonly { background-color: #f0f0f0; color: #333; font-weight: bold; border: 1px solid #ddd; cursor: not-allowed; }
+        /* 只读输入框样式 */
+        .input-readonly { background-color: #e9ecef; color: #555; font-weight: bold; border: 1px solid #ced4da; cursor: not-allowed; }
 
         .staff-calc-group { background-color: #f9f9f9; padding: 12px; border-radius: 6px; border: 1px solid #eee; margin-bottom: 15px; }
         .staff-calc-group h5 { margin: 0 0 8px 0; font-size: 13px; color: #333; border-bottom: 1px dashed #ccc; padding-bottom: 5px; }
@@ -117,43 +119,23 @@
         /* 底部图表 */
         .chart-container { background: white; padding: 25px; border-radius: 8px; margin-top: 20px; border: 1px solid var(--border-color); }
         .chart-row { display: flex; align-items: center; margin-bottom: 10px; font-size: 13px; }
-        
-        /* 标签宽度 */
         .chart-label { width: 200px; text-align: right; padding-right: 15px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
-        
-        /* 进度条区域 */
         .chart-bar-area { flex: 1; background: #f0f0f0; height: 24px; border-radius: 4px; overflow: hidden; }
         .chart-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; color: white; font-size: 12px; white-space: nowrap;}
-        
-        /* 数值显示区域 */
-        .chart-val { 
-            width: 120px;         
-            padding-left: 10px; 
-            font-weight: bold; 
-            color: #333; 
-            flex-shrink: 0;       
-            text-align: left;     
-        }
+        .chart-val { width: 120px; padding-left: 10px; font-weight: bold; color: #333; flex-shrink: 0; text-align: left; }
 
         .hidden { display: none !important; }
         
         .btn { background-color: #5C6E7D; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 20px; margin-bottom: 30px; font-weight: bold; font-size: 14px; transition: all 0.2s; }
         .btn:hover { background-color: #4a5a6a; transform: translateY(-1px); }
         .btn-link { background-color: #95a5a6; margin-top: 10px; font-size: 12px; padding: 8px; }
+        
+        /* 清除按钮样式 */
+        .btn-clear { background-color: white; color: #c0392b; border: 1px solid #e74c3c; margin-bottom: 10px; }
+        .btn-clear:hover { background-color: #fcebe9; transform: translateY(-1px); }
 
         /* PDF 隐藏域 */
-        #pdf-container {
-            position: fixed;
-            left: -9999px;
-            top: 0;
-            width: 900px; 
-            background: white;
-            padding: 40px;
-            box-sizing: border-box;
-            font-family: "Microsoft YaHei", sans-serif;
-            color: #333;
-        }
-        
+        #pdf-container { position: fixed; left: -9999px; top: 0; width: 900px; background: white; padding: 40px; box-sizing: border-box; font-family: "Microsoft YaHei", sans-serif; color: #333; }
         .pdf-header { border-bottom: 4px solid #5C6E7D; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
         .pdf-title { font-size: 26px; font-weight: bold; color: #2C3E50; }
         .pdf-date { font-size: 14px; color: #7F8C8D; }
@@ -172,6 +154,154 @@
         .pdf-task-name { font-weight: 500; }
         .pdf-chart-section { margin-top: 20px; border-top: 2px solid #eee; padding-top: 15px; }
         .pdf-chart-title { font-size: 14px; font-weight: bold; color: #7F8C8D; margin-bottom: 10px; }
+
+        /* === 排班沙盘样式 (V14.1 滚动条优化版) === */
+        .scheduler-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .scheduler-content { width: 95%; height: 90%; background: #fdfcfb; border-radius: 12px; display: flex; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; border: 4px solid white; }
+        .res-pool-panel { width: 280px; background: #eaeded; padding: 15px; display: flex; flex-direction: column; border-right: 2px solid #ccc; flex-shrink: 0; }
+        .pool-container { flex: 1; background: white; border: 2px dashed #bdc3c7; border-radius: 6px; padding: 10px; overflow-y: auto; align-content: flex-start; display: flex; flex-wrap: wrap; gap: 8px; }
+        .schedule-board { flex: 1; padding: 20px; overflow-y: auto; background: white; display: flex; gap: 20px; }
+        .schedule-col { flex: 1; display: flex; flex-direction: column; gap: 15px; height: 100%; }
+        
+        .schedule-zone { 
+            background: #f8f9fa; 
+            border: 2px dashed #dcdfe6; 
+            border-radius: 8px; 
+            padding: 10px; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        /* 内部放小人的盒子：基础样式 (V15.4 修复版) */
+        .zone-box { 
+            background: transparent; 
+            border: none !important; /* ★ 修复：去掉内边框 */
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 8px; 
+            align-content: flex-start; 
+            width: 100% !important;  /* ★ 修复：强制撑开 */
+            padding-right: 5px; 
+        }
+        
+        /* 本组出勤 (淡紫色 + 大空间 + 滚动条) */
+        .zone-base-container .schedule-zone { 
+            background: #f3e5f5; border-color: #ce93d8; flex: 2; 
+        }
+        .zone-base-container .zone-box {
+            min-height: 250px; max-height: 450px; overflow-y: auto;
+        }
+
+        /* 支援人员 (淡橙色 + 较小空间) */
+        .zone-sup-container .schedule-zone { 
+            background: #fff3e0; border-color: #ffcc80; flex: 1; 
+        }
+        .zone-sup-container .zone-box {
+            min-height: 100px; max-height: 150px; overflow-y: auto;
+        }
+
+        /* 缺口区域 */
+        .zone-gap-container .schedule-zone {
+            background: #fff0f0; border-color: #fadbd8; flex: 0 0 auto;
+        }
+        .zone-gap-container .zone-box {
+            min-height: 60px;
+        }
+
+        .zone-title { font-weight: bold; margin-bottom: 8px; font-size: 14px; display: flex; justify-content: space-between; color: #555; }
+        .zone-box::-webkit-scrollbar { width: 6px; }
+        .zone-box::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 3px; }
+        
+        /* 人员卡片 */
+        .staff-card { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; cursor: grab; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); user-select: none; position: relative; height: 24px; }
+        .staff-card:active { cursor: grabbing; transform: scale(1.05); }
+        .staff-type-1 { background: #3498db; }
+        .staff-type-2 { background: #27ae60; }
+        .staff-type-3 { background: #f1c40f; color: #333; }
+        .staff-delete { display: none; width: 16px; height: 16px; background: rgba(0,0,0,0.2); border-radius: 50%; text-align: center; line-height: 14px; font-size: 10px; cursor: pointer; margin-left: 5px; }
+        .staff-card:hover .staff-delete { display: inline-block; }
+        
+        .gap-block { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; background: #e74c3c; opacity: 0.8; border: 1px dashed white; cursor: not-allowed; }
+        .add-staff-area { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #ccc; }
+        .add-staff-area textarea { width: 100%; height: 60px; margin-bottom: 5px; font-size: 12px; padding: 5px; border-radius: 4px; border:1px solid #ccc; }
+        .type-radio { font-size: 12px; margin-right: 8px; cursor: pointer; }
+
+        /* === V15.3 终极 PDF 报表样式 (宽屏截图适配) === */
+        .pdf-mode-active {
+            display: block !important;
+            background: white !important;
+            box-shadow: none !important;
+            border: none !important;
+            padding: 0 !important;
+            position: absolute !important;
+            top: 0;
+            left: 0;
+            z-index: -9999;
+            min-width: 1280px !important; /* 强制宽屏 */
+        }
+        
+        /* 隐藏杂项 */
+        .pdf-mode-active .res-pool-panel,
+        .pdf-mode-active .add-staff-area,
+        .pdf-mode-active .staff-delete,
+        .pdf-mode-active .scheduler-content > button { 
+            display: none !important; 
+        }
+
+        /* 主体容器：左右布局，撑满 */
+        .pdf-mode-active .schedule-board {
+            width: 100% !important;
+            padding: 20px 40px !important;
+            margin: 0 !important;
+            background: white !important;
+            display: flex !important; /* Flex 布局 */
+            gap: 30px !important;
+            align-items: flex-start !important;
+        }
+
+        .pdf-mode-active #sched-view-roche {
+            display: flex !important;
+            flex-direction: row !important; /* 左右排列 */
+            width: 100% !important;
+            gap: 30px !important;
+        }
+
+        .pdf-mode-active .schedule-col {
+            flex: 1 !important;
+            border: none !important;
+            padding: 0 !important;
+            height: auto !important;
+            width: auto !important;
+        }
+
+        /* 盒子全展开 */
+        .pdf-mode-active .schedule-zone,
+        .pdf-mode-active .zone-box {
+            max-height: none !important;
+            min-height: 80px !important;
+            overflow: visible !important;
+            height: auto !important;
+            display: flex !important;
+            flex-wrap: wrap !important;
+            background: #fff !important;
+            border: 1px solid #ddd !important;
+            margin-bottom: 15px;
+        }
+
+        .pdf-mode-active .zone-gap-container {
+            display: block !important;
+            height: auto !important;
+        }
+
+        .pdf-mode-active h3 {
+            color: #2c3e50 !important;
+            border-bottom: 2px solid #7f8c8d;
+            padding-bottom: 10px;
+            margin-top: 0 !important;
+            margin-bottom: 20px;
+            font-size: 20px !important;
+            text-align: center;
+        }
 
         @media print {
             body { height: auto; overflow: visible; display: block; }
@@ -213,23 +343,37 @@
             <label>⏱️ 班次时长 (通用)</label>
             <div style="display:flex; align-items:center; gap:10px;">
                 <input type="number" id="shift_generic" value="8" min="1" max="24" step="0.5" oninput="update()" style="font-size:14px; font-weight:bold; color:var(--device-green);">
+                <span style="font-size:12px; color:#999;">H / 班</span>
             </div>
         </div>
+
         <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
             <h3>👥 正式工出勤计算</h3>
+            <button class="btn" onclick="openScheduler()" style="margin: 5px 0 15px 0; background: #8e44ad; padding: 8px; font-size: 13px;">🧩 打开人员排班沙盘 (点名)</button>
+            
             <div id="formal-roche">
                 <div class="staff-calc-group">
                     <h5>❄️ 罗诊冷链组</h5>
-                    <div class="calc-row"><label>➕ 在册人数</label><input type="number" id="base_roche_cold" class="staff-base" min="0" value="0" oninput="update()"></div>
-                    <div class="calc-row"><label>➖ 请假/派去</label><input type="number" id="abs_roche_cold" class="staff-dynamic" min="0" value="0" oninput="update()"></div>
-                    <div class="calc-row"><label>➕ 派来支援</label><input type="number" id="sup_roche_cold" class="staff-dynamic" min="0" value="0" oninput="update()"></div>
+                    <div class="calc-row">
+                        <label>🏠 本组出勤</label>
+                        <input type="number" id="base_roche_cold" class="staff-base input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
+                    <div class="calc-row">
+                        <label>🟧 派来支援</label>
+                        <input type="number" id="sup_roche_cold" class="staff-dynamic input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
                     <div class="calc-result-row"><label>〓 实际可用</label><input type="number" id="fc_roche_cold" class="input-readonly" readonly value="0"></div>
                 </div>
                 <div class="staff-calc-group">
                     <h5>☀️ 罗诊常温组</h5>
-                    <div class="calc-row"><label>➕ 在册人数</label><input type="number" id="base_roche_amb" class="staff-base" min="0" value="0" oninput="update()"></div>
-                    <div class="calc-row"><label>➖ 请假/派去</label><input type="number" id="abs_roche_amb" class="staff-dynamic" min="0" value="0" oninput="update()"></div>
-                    <div class="calc-row"><label>➕ 派来支援</label><input type="number" id="sup_roche_amb" class="staff-dynamic" min="0" value="0" oninput="update()"></div>
+                    <div class="calc-row">
+                        <label>🏠 本组出勤</label>
+                        <input type="number" id="base_roche_amb" class="staff-base input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
+                    <div class="calc-row">
+                        <label>🟧 派来支援</label>
+                        <input type="number" id="sup_roche_amb" class="staff-dynamic input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
                     <div class="calc-result-row"><label>〓 实际可用</label><input type="number" id="fc_roche_amb" class="input-readonly" readonly value="0"></div>
                 </div>
             </div>
@@ -237,9 +381,14 @@
             <div id="formal-device" class="hidden">
                 <div class="staff-calc-group">
                     <h5>⚙️ 器械组</h5>
-                    <div class="calc-row"><label>➕ 在册人数</label><input type="number" id="base_device" class="staff-base" min="0" value="0" oninput="update()"></div>
-                    <div class="calc-row"><label>➖ 请假/派去</label><input type="number" id="abs_device" class="staff-dynamic" min="0" value="0" oninput="update()"></div>
-                    <div class="calc-row"><label>➕ 派来支援</label><input type="number" id="sup_device" class="staff-dynamic" min="0" value="0" oninput="update()"></div>
+                    <div class="calc-row">
+                        <label>🏠 本组出勤</label>
+                        <input type="number" id="base_device" class="staff-base input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
+                    <div class="calc-row">
+                        <label>🟧 派来支援</label>
+                        <input type="number" id="sup_device" class="staff-dynamic input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
                     <div class="calc-result-row"><label>〓 实际可用</label><input type="number" id="fc_device" class="input-readonly" readonly value="0"></div>
                 </div>
             </div>
@@ -247,15 +396,21 @@
             <div id="formal-medicine" class="hidden">
                 <div class="staff-calc-group">
                     <h5>🌿 药品组</h5>
-                    <div class="calc-row"><label>➕ 在册人数</label><input type="number" id="base_medicine" class="staff-base" min="0" value="0" oninput="update()"></div>
-                    <div class="calc-row"><label>➖ 请假/派去</label><input type="number" id="abs_medicine" class="staff-dynamic" min="0" value="0" oninput="update()"></div>
-                    <div class="calc-row"><label>➕ 派来支援</label><input type="number" id="sup_medicine" class="staff-dynamic" min="0" value="0" oninput="update()"></div>
+                    <div class="calc-row">
+                        <label>🏠 本组出勤</label>
+                        <input type="number" id="base_medicine" class="staff-base input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
+                    <div class="calc-row">
+                        <label>🟧 派来支援</label>
+                        <input type="number" id="sup_medicine" class="staff-dynamic input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
                     <div class="calc-result-row"><label>〓 实际可用</label><input type="number" id="fc_medicine" class="input-readonly" readonly value="0"></div>
                 </div>
             </div>
         </div>
 
         <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px;">
+            <button class="btn btn-clear" onclick="clearData()">🗑️ 一键清除今日业务数据</button>
             <button class="btn" onclick="generatePDF()" style="background-color: #e74c3c;">📄 生成汇报 PDF</button>
             <div id="pdf-msg" style="font-size:12px; color:#c0392b; text-align:center; display:none;">生成中，请稍候...</div>
             <button class="btn btn-link" onclick="generateLink()">🔗 仅生成链接</button>
@@ -433,6 +588,78 @@
     </div>
 
     <div id="pdf-container"></div>
+    
+    <div id="scheduler-modal" class="scheduler-modal">
+        <div class="scheduler-content" id="scheduler-capture-area">
+            <div class="res-pool-panel">
+                <h4 style="margin-top:0">🗂️ 人员资源池</h4>
+                <div class="add-staff-area">
+                    <textarea id="new-staff-names" placeholder="批量添加姓名 (空格隔开)"></textarea>
+                    <div style="margin-bottom:5px;">
+                        <label class="type-radio"><input type="radio" name="staffType" value="1" checked>🟦管理</label>
+                        <label class="type-radio"><input type="radio" name="staffType" value="2">🟩一线</label>
+                        <label class="type-radio"><input type="radio" name="staffType" value="3">🟨临时</label>
+                    </div>
+                    <button class="btn" onclick="addNewStaff()" style="margin:0; padding:6px; background:#2c3e50;">➕ 批量入池</button>
+                </div>
+                <div style="font-size:12px; color:#666; margin-bottom:5px;">拖拽人员到右侧排班 (点击X回池)</div>
+                <div id="pool-container" class="pool-container"></div>
+            </div>
+
+            <div class="schedule-board">
+                <div id="sched-view-roche" class="schedule-col hidden" style="display:flex; flex-direction:row; width:100%;">
+                    <div class="schedule-col" style="border-right:2px solid #eee; padding-right:10px;">
+                        <h3 style="color:var(--roche-blue)">❄️ 冷链组排班</h3>
+                        <div class="schedule-zone zone-base-container">
+                            <div class="zone-title">🏠 本组出勤 <span id="count-roche-cold-base">0</span></div>
+                            <div id="zone_roche_cold_base" class="zone-box sortable-zone" data-target="base_roche_cold"></div>
+                        </div>
+                        <div class="schedule-zone zone-sup-container">
+                            <div class="zone-title">🟧 支援人员 <span id="count-roche-cold-sup">0</span></div>
+                            <div id="zone_roche_cold_sup" class="zone-box sortable-zone" data-target="sup_roche_cold"></div>
+                        </div>
+                        <div class="schedule-zone zone-gap-container" style="background:#fff0f0; border-color:#fadbd8">
+                            <div class="zone-title" style="color:#c0392b">🟥 人员缺口 (自动生成)</div>
+                            <div id="gap_roche_cold_area" class="zone-box" style="border:none; background:transparent;"></div>
+                        </div>
+                    </div>
+                    <div class="schedule-col" style="padding-left:10px;">
+                        <h3 style="color:var(--roche-sand)">☀️ 常温组排班</h3>
+                        <div class="schedule-zone zone-base-container">
+                            <div class="zone-title">🏠 本组出勤 <span id="count-roche-amb-base">0</span></div>
+                            <div id="zone_roche_amb_base" class="zone-box sortable-zone" data-target="base_roche_amb"></div>
+                        </div>
+                        <div class="schedule-zone zone-sup-container">
+                            <div class="zone-title">🟧 支援人员 <span id="count-roche-amb-sup">0</span></div>
+                            <div id="zone_roche_amb_sup" class="zone-box sortable-zone" data-target="sup_roche_amb"></div>
+                        </div>
+                        <div class="schedule-zone zone-gap-container" style="background:#fff0f0; border-color:#fadbd8">
+                            <div class="zone-title" style="color:#c0392b">🟥 人员缺口 (自动生成)</div>
+                            <div id="gap_roche_amb_area" class="zone-box" style="border:none; background:transparent;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sched-view-generic" class="schedule-col hidden">
+                    <h3 id="sched-generic-title">⚙️ 项目组排班</h3>
+                    <div class="schedule-zone zone-base-container">
+                        <div class="zone-title">🏠 本组出勤 <span id="count-generic-base">0</span></div>
+                        <div id="zone_generic_base" class="zone-box sortable-zone"></div>
+                    </div>
+                    <div class="schedule-zone zone-sup-container">
+                        <div class="zone-title">🟧 支援人员 <span id="count-generic-sup">0</span></div>
+                        <div id="zone_generic_sup" class="zone-box sortable-zone"></div>
+                    </div>
+                    <div class="schedule-zone zone-gap-container" style="background:#fff0f0; border-color:#fadbd8">
+                        <div class="zone-title" style="color:#c0392b">🟥 人员缺口 (自动生成)</div>
+                        <div id="gap_generic_area" class="zone-box" style="border:none; background:transparent;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="closeScheduler()" class="scheduler-close-btn" style="position:absolute; top:10px; right:10px; width:40px; height:40px; background:#e74c3c; color:white; border:none; border-radius:50%; font-size:20px; cursor:pointer;">×</button>
+        </div>
+    </div>
 
 <script>
     const date = new Date();
@@ -440,12 +667,23 @@
     document.getElementById('currentDate').innerText = dateStr;
 
     let currentProject = 'roche';
+    
+    // 全局数据结构：存储所有人员
+    let staffData = {
+        pool: [], // 资源池 {id, name, type}
+        roche_cold_base: [], roche_cold_sup: [],
+        roche_amb_base: [], roche_amb_sup: [],
+        device_base: [], device_sup: [],
+        medicine_base: [], medicine_sup: []
+    };
 
     function calcStaff() {
+        // 由于删除了缺勤行，这里实际上只需要计算 base + sup
         const groups = ['roche_cold', 'roche_amb', 'device', 'medicine'];
         groups.forEach(g => {
             const base = parseInt(document.getElementById('base_' + g)?.value) || 0;
-            const abs = parseInt(document.getElementById('abs_' + g)?.value) || 0;
+            // 缺勤默认为0 (因为HTML删了)
+            const abs = 0; 
             const sup = parseInt(document.getElementById('sup_' + g)?.value) || 0;
             const actual = Math.max(0, base - abs + sup);
             const targetInput = document.getElementById('fc_' + g);
@@ -457,23 +695,19 @@
         const select = document.getElementById('project-select');
         currentProject = select.value;
         const pageTitle = document.getElementById('page-title');
-
-        // ★★★ 核心修复点：这里控制谁显示、谁隐藏 ★★★
+        
+        // 班次显示控制
         const groupRoche = document.getElementById('shift-group-roche');
         const groupGeneric = document.getElementById('shift-group-generic');
 
         if (currentProject === 'roche') {
-            // 如果是罗诊：显示罗诊组，隐藏通用组
             if(groupRoche) groupRoche.classList.remove('hidden');
             if(groupGeneric) groupGeneric.classList.add('hidden');
-            
             pageTitle.innerText = "罗诊项目人力排班决策模型";
             select.style.backgroundColor = "var(--roche-blue)";
         } else {
-            // 如果是其他：隐藏罗诊组，显示通用组
             if(groupRoche) groupRoche.classList.add('hidden');
             if(groupGeneric) groupGeneric.classList.remove('hidden');
-
             if (currentProject === 'device') {
                 pageTitle.innerText = "器械项目人力排班决策模型";
                 select.style.backgroundColor = "var(--device-green)";
@@ -483,7 +717,7 @@
             }
         }
 
-        // 下面是原本控制卡片显示的逻辑
+        // 区域显示控制
         document.getElementById('view-roche').classList.add('hidden');
         document.getElementById('view-device').classList.add('hidden');
         document.getElementById('view-medicine').classList.add('hidden');
@@ -515,24 +749,55 @@
         update(); 
     }
 
+/* === V16.1 初始化 (支持读取排班链接 + 智能合并) === */
     function init() {
-        // 获取网址里的参数
         const params = new URLSearchParams(window.location.search);
+        
+        // 1. 先加载本地数据 (作为底座)
+        loadStaffData();
 
-        document.querySelectorAll('input, select').forEach(el => {
-            // 1. 先尝试从 LocalStorage 读取 (仅限 base_ 开头的正式工在册人数)
-            if (el.id && el.id.startsWith('base_')) {
-                const stored = localStorage.getItem(el.id);
-                if (stored) el.value = stored;
+        // 2. 尝试从链接加载排班数据 (作为补丁)
+        if (params.has('sdata')) {
+            try {
+                // 解码：Base64 -> 中文 -> JSON
+                const compressed = params.get('sdata');
+                const jsonStr = decodeURIComponent(atob(compressed));
+                const linkData = JSON.parse(jsonStr);
+
+                // ★★★ 智能合并逻辑 ★★★
+                // 只有当链接里对应的池子“有人”时，才覆盖本地的。
+                // 这样避免“常温哥”发来的空冷链数据把“冷链姐”本地的数据清空了。
+                
+                // 遍历 staffData 的所有 key (pool, roche_cold_base, ...)
+                for (let key in staffData) {
+                    // 如果链接里这个 key 有数据 (且不是空数组)
+                    if (linkData[key] && Array.isArray(linkData[key]) && linkData[key].length > 0) {
+                        staffData[key] = linkData[key]; // 覆盖/合并
+                    }
+                }
+                
+                // 合并完立刻保存到本地
+                saveStaffData();
+                console.log("已从链接成功合并排班数据");
+                
+            } catch (e) {
+                console.error("链接排班数据解析失败", e);
             }
+        }
 
-            // 2. ★★★ 修复核心：如果网址里带了数据，强制覆盖填入框内 ★★★
+        // 3. 处理输入框数据 (优先级：链接 > 本地记忆)
+        document.querySelectorAll('input, select').forEach(el => {
+            // 先读本地
+            if (el.id) {
+                const storedVal = localStorage.getItem(el.id);
+                if (storedVal !== null) el.value = storedVal;
+            }
+            // 再读链接 (覆盖)
             if (el.id && params.has(el.id)) {
                 el.value = params.get(el.id);
             }
         });
         
-        // 3. 确保切换到正确的项目视图
         if(params.has('project-select')){
             document.getElementById('project-select').value = params.get('project-select');
         }
@@ -540,17 +805,25 @@
         switchView(); 
     }
 
-    function update() {
+    function update(e) {
         calcStaff();
-        document.querySelectorAll('.staff-base').forEach(el => { localStorage.setItem(el.id, el.value); });
+        
+        // ★ V16.0 全局自动保存 ★
+        // 只要输入框变动，立刻把这个值存到本地，防止手抖关网页
+        // e.target 是当前触发事件的元素
+        if (e && e.target && e.target.id) {
+            localStorage.setItem(e.target.id, e.target.value);
+        } else {
+            // 如果是通用调用，遍历所有输入框存一遍 (保险起见)
+            document.querySelectorAll('input, select').forEach(el => {
+                if(el.id) localStorage.setItem(el.id, el.value);
+            });
+        }
 
         const eff = parseFloat(document.getElementById('eff').value);
         const oee = parseFloat(document.getElementById('oee').value);
         
-        // ★ 改动1：不再读取单一的 shift，而是准备好变量
         let shiftCold = 8, shiftAmb = 8, shiftGen = 8;
-        
-        // 读取数值
         shiftCold = parseFloat(document.getElementById('shift_roche_cold').value) || 8;
         shiftAmb = parseFloat(document.getElementById('shift_roche_amb').value) || 8;
         shiftGen = parseFloat(document.getElementById('shift_generic').value) || 8;
@@ -558,9 +831,8 @@
         document.getElementById('disp_eff').innerText = eff.toFixed(2);
         document.getElementById('disp_oee').innerText = oee.toFixed(2);
         
-        // 显示班次时长（如果是罗诊，显示 "8/10"，否则显示 "8"）
         if(currentProject === 'roche') {
-             document.getElementById('res_shift').innerText = shiftCold === shiftAmb ? shiftCold : `❄️${shiftCold}/☀️${shiftAmb}`;
+             document.getElementById('res_shift').innerText = shiftCold === shiftAmb ? shiftCold : `❄️${shiftCold} / ☀️${shiftAmb}`;
         } else {
              document.getElementById('res_shift').innerText = shiftGen;
         }
@@ -568,12 +840,9 @@
         let totalNeed = 0;
         let chartData = [];
         
-        // ★ 改动2：不再计算全局 tempCapPerPerson，改为各项目内部计算
-
         if (currentProject === 'roche') {
-            // 定义各自的人效
-            const capCold = shiftCold * oee * eff; // 冷链单人产能
-            const capAmb = shiftAmb * oee * eff;   // 常温单人产能
+            const capCold = shiftCold * oee * eff; 
+            const capAmb = shiftAmb * oee * eff;   
 
             const fcCold = parseInt(document.getElementById('fc_roche_cold').value) || 0;
             const fcAmb = parseInt(document.getElementById('fc_roche_amb').value) || 0;
@@ -591,17 +860,15 @@
 
                     if(isAmb) hoursAmb += hours; else hoursCold += hours;
                     
-                    // ★ 图表里的人力计算也要区分班次
                     chartData.push({ 
                         name: fullName, 
                         hours: hours, 
-                        people: hours / (isAmb ? capAmb : capCold), // 这里区分了除数
+                        people: hours / (isAmb ? capAmb : capCold), 
                         color: isAmb ? 'var(--roche-sand)' : 'var(--roche-blue)' 
                     });
                 }
             });
 
-            // ★ 计算缺口时，分别乘以各自的班次时长
             const gapCold = Math.max(0, (hoursCold / oee) - (fcCold * shiftCold));
             const gapAmb = Math.max(0, (hoursAmb / oee) - (fcAmb * shiftAmb));
             
@@ -615,7 +882,7 @@
             totalNeed = needCold + needAmb;
 
         } else if (currentProject === 'device') {
-            const capGen = shiftGen * oee * eff; // 通用产能
+            const capGen = shiftGen * oee * eff;
             const fc = parseInt(document.getElementById('fc_device').value) || 0;
             let totalHours = 0;
             document.querySelectorAll('#view-device .data-input').forEach(input => {
@@ -630,14 +897,14 @@
                     chartData.push({ name: fullName, hours: hours, people: hours / capGen, color: 'var(--device-green)' });
                 }
             });
-            const gap = Math.max(0, (totalHours / oee) - (fc * shiftGen)); // 使用通用班次
+            const gap = Math.max(0, (totalHours / oee) - (fc * shiftGen)); 
             const need = Math.ceil(gap / capGen);
             document.getElementById('res_device').innerText = need + " 人";
             document.getElementById('gap_device').innerText = gap.toFixed(1);
             totalNeed = need;
 
         } else if (currentProject === 'medicine') {
-            const capGen = shiftGen * oee * eff; // 通用产能
+            const capGen = shiftGen * oee * eff;
             const fc = parseInt(document.getElementById('fc_medicine').value) || 0;
             let totalHours = 0;
             document.querySelectorAll('#view-medicine .data-input').forEach(input => {
@@ -652,7 +919,7 @@
                     chartData.push({ name: fullName, hours: hours, people: hours / capGen, color: 'var(--medicine-purple)' });
                 }
             });
-            const gap = Math.max(0, (totalHours / oee) - (fc * shiftGen)); // 使用通用班次
+            const gap = Math.max(0, (totalHours / oee) - (fc * shiftGen)); 
             const need = Math.ceil(gap / capGen);
             document.getElementById('res_medicine').innerText = need + " 人";
             document.getElementById('gap_medicine').innerText = gap.toFixed(1);
@@ -661,6 +928,7 @@
 
         document.getElementById('res_total').innerText = totalNeed + " 人";
         renderChart(chartData);
+        syncGapBlocks(); // 同步沙盘红块
     }
 
     function renderChart(data) {
@@ -684,75 +952,325 @@
         });
     }
 
+    /* === V16.0 一键清除业务数据 === */
+    function clearData() {
+        if(confirm("确定要清空今日填写的【所有业务数据】吗？\n\n注意：人员排班和基础参数会被保留。")) {
+            // 只清空中间区域的业务输入框 (data-input)
+            document.querySelectorAll('.data-input').forEach(input => {
+                input.value = ""; // 清空界面
+                if(input.id) localStorage.removeItem(input.id); // 擦除本地记忆
+            });
+            update(); // 触发重算，让数字归零
+        }
+    }
+
+    /* === 排班沙盘核心逻辑 === */
+    function openScheduler() {
+        document.getElementById('scheduler-modal').style.display = 'flex';
+        loadStaffData();
+        renderScheduler();
+        syncGapBlocks();
+    }
+
+    function closeScheduler() {
+        document.getElementById('scheduler-modal').style.display = 'none';
+        saveStaffData();
+    }
+
+    function loadStaffData() {
+        const stored = localStorage.getItem('staffData_v1');
+        if (stored) {
+            try { staffData = JSON.parse(stored); } catch(e) { console.error(e); }
+        }
+        initSortable();
+    }
+
+    function saveStaffData() {
+        localStorage.setItem('staffData_v1', JSON.stringify(staffData));
+        updateMainInputsFromScheduler(); 
+    }
+
+    function updateMainInputsFromScheduler() {
+        const map = {
+            'roche_cold_base': 'base_roche_cold', 'roche_cold_sup': 'sup_roche_cold',
+            'roche_amb_base': 'base_roche_amb', 'roche_amb_sup': 'sup_roche_amb',
+            'device_base': 'base_device', 'device_sup': 'sup_device',
+            'medicine_base': 'base_medicine', 'medicine_sup': 'sup_medicine'
+        };
+
+        for (let key in map) {
+            const count = staffData[key] ? staffData[key].length : 0;
+            const inputId = map[key];
+            const el = document.getElementById(inputId);
+            if (el) {
+                el.value = count;
+                // 再次确保只读状态
+                el.classList.add('input-readonly');
+                el.readOnly = true;
+                const spanId = 'count-' + key.replace(/_/g, '-');
+                const countSpan = document.getElementById(spanId);
+                if(countSpan) countSpan.innerText = count;
+            }
+        }
+        update(); 
+        syncGapBlocks(); 
+    }
+
+    function renderScheduler() {
+        document.getElementById('sched-view-roche').classList.add('hidden');
+        document.getElementById('sched-view-generic').classList.add('hidden');
+        
+        if (currentProject === 'roche') {
+            document.getElementById('sched-view-roche').classList.remove('hidden');
+            document.getElementById('sched-view-roche').style.display = 'flex';
+        } else {
+            document.getElementById('sched-view-generic').classList.remove('hidden');
+            const title = currentProject === 'device' ? '⚙️ 器械组排班' : '🌿 药品组排班';
+            document.getElementById('sched-generic-title').innerText = title;
+            document.getElementById('zone_generic_base').id = `zone_${currentProject}_base`;
+            document.getElementById('zone_generic_sup').id = `zone_${currentProject}_sup`;
+            document.getElementById('count-generic-base').id = `count-${currentProject}-base`;
+            document.getElementById('count-generic-sup').id = `count-${currentProject}-sup`;
+        }
+
+        const poolEl = document.getElementById('pool-container');
+        poolEl.innerHTML = '';
+        staffData.pool.forEach((staff, idx) => {
+            poolEl.appendChild(createStaffEl(staff, 'pool', idx));
+        });
+
+        const zones = ['roche_cold_base', 'roche_cold_sup', 'roche_amb_base', 'roche_amb_sup', 'device_base', 'device_sup', 'medicine_base', 'medicine_sup'];
+        zones.forEach(zoneKey => {
+            const el = document.getElementById('zone_' + zoneKey);
+            if(el) {
+                el.innerHTML = '';
+                if(staffData[zoneKey]) {
+                    staffData[zoneKey].forEach((staff, idx) => {
+                        el.appendChild(createStaffEl(staff, zoneKey, idx));
+                    });
+                }
+            }
+        });
+        updateMainInputsFromScheduler();
+    }
+
+    function createStaffEl(staff, sourceKey, idx) {
+        const div = document.createElement('div');
+        div.className = `staff-card staff-type-${staff.type}`;
+        div.innerHTML = `${staff.name} <span class="staff-delete" onclick="removeStaff('${sourceKey}', ${idx})">×</span>`;
+        div.dataset.id = staff.id; 
+        return div;
+    }
+
+    function addNewStaff() {
+        const input = document.getElementById('new-staff-names');
+        const names = input.value.trim();
+        if(!names) return;
+        const type = document.querySelector('input[name="staffType"]:checked').value;
+        const nameArr = names.split(/[\s,，]+/);
+        nameArr.forEach(n => {
+            if(n) {
+                staffData.pool.push({
+                    id: Date.now() + Math.random(),
+                    name: n,
+                    type: type
+                });
+            }
+        });
+        input.value = '';
+        saveStaffData();
+        renderScheduler();
+    }
+
+    function removeStaff(sourceKey, idx) {
+        const staff = staffData[sourceKey].splice(idx, 1)[0];
+        if (sourceKey !== 'pool') staffData.pool.push(staff);
+        saveStaffData();
+        renderScheduler();
+    }
+
+    /* === V15.0 缺口逻辑 (直接读取需求数) === */
+    function syncGapBlocks() {
+        const map = {
+            'gap_roche_cold_area': 'res_roche_cold',
+            'gap_roche_amb_area': 'res_roche_amb',
+            'gap_generic_area': currentProject === 'device' ? 'res_device' : 'res_medicine'
+        };
+
+        ['gap_roche_cold_area', 'gap_roche_amb_area', 'gap_generic_area'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.innerHTML = '';
+        });
+
+        for (let areaId in map) {
+            if (currentProject === 'roche' && areaId === 'gap_generic_area') continue;
+            if (currentProject !== 'roche' && areaId.includes('roche')) continue;
+
+            // 直接读取主页算出来的“缺口人数”
+            const targetId = map[areaId];
+            const needText = document.getElementById(targetId)?.innerText || "0";
+            const needCount = parseInt(needText) || 0; 
+            
+            const container = document.getElementById(areaId);
+            if (container) {
+                if (needCount > 0) {
+                    for(let i=0; i<needCount; i++) {
+                        const block = document.createElement('div');
+                        block.className = 'gap-block';
+                        block.innerText = `缺口${i+1}`;
+                        container.appendChild(block);
+                    }
+                } else {
+                    container.innerHTML = '<div style="font-size:12px; color:#27ae60; padding:5px; font-weight:bold;">✨ 人员充足 (已满足需求)</div>';
+                }
+            }
+        }
+    }
+
+    function initSortable() {
+        const containers = document.querySelectorAll('.pool-container, .sortable-zone');
+        containers.forEach(el => {
+            if(el._sortable) el._sortable.destroy();
+            el._sortable = new Sortable(el, {
+                group: 'staff',
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                onEnd: function (evt) {
+                    const itemEl = evt.item;
+                    const fromKey = evt.from.id === 'pool-container' ? 'pool' : evt.from.id.replace('zone_', '');
+                    const toKey = evt.to.id === 'pool-container' ? 'pool' : evt.to.id.replace('zone_', '');
+                    if (fromKey === toKey && evt.newIndex === evt.oldIndex) return;
+                    const movedItem = staffData[fromKey].splice(evt.oldIndex, 1)[0];
+                    staffData[toKey].splice(evt.newIndex, 0, movedItem);
+                    saveStaffData();
+                }
+            });
+        });
+    }
+
+    /* === V15.3 PDF生成 (宽屏截图适配 + 左右布局) === */
     async function generatePDF() {
         const { jsPDF } = window.jspdf;
         const pdfContainer = document.getElementById('pdf-container');
-        document.getElementById('pdf-msg').style.display = 'block';
+        const msgEl = document.getElementById('pdf-msg');
+        if(msgEl) msgEl.style.display = 'block';
+        
+        // --- 1. 截图沙盘 ---
+        let schedulerImgData = null;
+        let schedulerRatio = 0;
+        
+        const modal = document.getElementById('scheduler-modal');
+        const schedulerContent = document.getElementById('scheduler-capture-area');
+        
+        const wasVisible = modal.style.display === 'flex';
+        const originalStyle = schedulerContent.style.cssText;
+        
+        modal.style.display = 'flex';
+        
+        // 克隆并应用宽屏样式
+        schedulerContent.classList.add('pdf-mode-active'); 
+        schedulerContent.style.width = '1350px'; 
+        schedulerContent.style.height = 'auto'; 
+        schedulerContent.style.position = 'fixed'; 
+        schedulerContent.style.top = '-9999px';
+        schedulerContent.style.left = '0';
+        document.body.appendChild(schedulerContent); 
 
+        // 插入报表头
+        const headerDiv = document.createElement('div');
+        headerDiv.innerHTML = `
+            <div style="padding: 40px 40px 10px 40px; background: #fff; text-align: center;">
+                <div style="font-size: 32px; font-weight: bold; color: #2C3E50; margin-bottom: 15px;">人员排班详细沙盘</div>
+                <div style="font-size: 16px; color: #7F8C8D; border-bottom: 2px solid #BDC3C7; padding-bottom: 20px; display: flex; justify-content: center; gap: 40px;">
+                    <span>📅 执行日期: ${dateStr}</span>
+                    <span>🏭 所属项目: ${document.getElementById('project-select').selectedOptions[0].text}</span>
+                </div>
+            </div>
+            <div style="padding: 10px 40px 30px 40px; background: #fff; color: #555; font-size: 14px; display: flex; justify-content: center; gap: 30px; align-items: center;">
+                <strong style="font-size:16px;">图例：</strong> 
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#3498db; margin-right:6px; border-radius:3px;"></span> 管理/文员</span>
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#27ae60; margin-right:6px; border-radius:3px;"></span> 一线员工</span>
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#f1c40f; margin-right:6px; border-radius:3px;"></span> 临时工</span>
+                <span style="display:flex; align-items:center; margin-left:10px;"><span style="width:16px; height:16px; background:#e74c3c; margin-right:6px; border-radius:3px;"></span> 缺口</span>
+            </div>
+        `;
+        schedulerContent.insertBefore(headerDiv, schedulerContent.firstChild);
+
+        try {
+            await new Promise(r => setTimeout(r, 300)); 
+            
+            const canvas2 = await html2canvas(schedulerContent, { 
+                scale: 1.5, 
+                useCORS: true, 
+                backgroundColor: '#ffffff',
+                windowWidth: 1400,
+                height: schedulerContent.scrollHeight
+            });
+            schedulerImgData = canvas2.toDataURL('image/png');
+            schedulerRatio = canvas2.height / canvas2.width;
+        } catch(e) { console.error("截图失败:", e); } 
+        finally { 
+            schedulerContent.classList.remove('pdf-mode-active'); 
+            if(headerDiv.parentNode) headerDiv.parentNode.removeChild(headerDiv);
+            document.getElementById('scheduler-modal').appendChild(schedulerContent); 
+            schedulerContent.style.cssText = originalStyle; 
+            schedulerContent.style.position = '';
+            schedulerContent.style.top = '';
+            schedulerContent.style.left = '';
+            if(!wasVisible) modal.style.display = 'none'; 
+        }
+
+        // --- 2. 构建第一页 ---
         const colorMap = {
-            'roche': ['#2C3E50', '#c0392b', '#2980b9'], // 标题色, 缺口红, 强调蓝
-            'device': ['#556B2F', '#c0392b', '#9CAF88'],
+            'roche': ['#2C3E50', '#c0392b', '#2980b9'], 
+            'device': ['#556B2F', '#c0392b', '#9CAF88'], 
             'medicine': ['#555', '#c0392b', '#95A5A6']
         };
         const theme = colorMap[currentProject];
+        const getTxt = (id) => document.getElementById(id)?.innerText || '0';
+        const getVal = (id) => document.getElementById(id)?.value || '0';
 
         let html = `
             <div class="pdf-header">
-                <div class="pdf-title" style="color:${theme[0]}">${document.getElementById('page-title').innerText} - 日报</div>
+                <div class="pdf-title" style="color:${theme[0]}">${getTxt('page-title')} - 日报</div>
                 <div class="pdf-date">${dateStr}</div>
             </div>
+            <div class="pdf-decision-row">
         `;
-
-        html += `<div class="pdf-decision-row">`;
         if (currentProject === 'roche') {
-            html += `<div class="pdf-kpi-card" style="background:var(--roche-blue)"><div class="pdf-kpi-title">❄️ 冷链需求</div><div class="pdf-kpi-val">${document.getElementById('res_roche_cold').innerText}</div><div class="pdf-kpi-sub">缺口工时: ${document.getElementById('gap_roche_cold').innerText} H</div></div>`;
-            html += `<div class="pdf-kpi-card" style="background:var(--roche-sand)"><div class="pdf-kpi-title">☀️ 常温需求</div><div class="pdf-kpi-val">${document.getElementById('res_roche_amb').innerText}</div><div class="pdf-kpi-sub">缺口工时: ${document.getElementById('gap_roche_amb').innerText} H</div></div>`;
+            html += `<div class="pdf-kpi-card" style="background:var(--roche-blue)"><div class="pdf-kpi-title">❄️ 冷链需求</div><div class="pdf-kpi-val">${getTxt('res_roche_cold')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_roche_cold')} H</div></div>`;
+            html += `<div class="pdf-kpi-card" style="background:var(--roche-sand)"><div class="pdf-kpi-title">☀️ 常温需求</div><div class="pdf-kpi-val">${getTxt('res_roche_amb')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_roche_amb')} H</div></div>`;
         } else if (currentProject === 'device') {
-            html += `<div class="pdf-kpi-card" style="background:var(--device-green)"><div class="pdf-kpi-title">⚙️ 器械需求</div><div class="pdf-kpi-val">${document.getElementById('res_device').innerText}</div><div class="pdf-kpi-sub">缺口工时: ${document.getElementById('gap_device').innerText} H</div></div>`;
+            html += `<div class="pdf-kpi-card" style="background:var(--device-green)"><div class="pdf-kpi-title">⚙️ 器械需求</div><div class="pdf-kpi-val">${getTxt('res_device')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_device')} H</div></div>`;
         } else {
-            html += `<div class="pdf-kpi-card" style="background:var(--medicine-purple)"><div class="pdf-kpi-title">🌿 药品需求</div><div class="pdf-kpi-val">${document.getElementById('res_medicine').innerText}</div><div class="pdf-kpi-sub">缺口工时: ${document.getElementById('gap_medicine').innerText} H</div></div>`;
+            html += `<div class="pdf-kpi-card" style="background:var(--medicine-purple)"><div class="pdf-kpi-title">🌿 药品需求</div><div class="pdf-kpi-val">${getTxt('res_medicine')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_medicine')} H</div></div>`;
         }
-        
-        // ★★★ PDF 班次显示修复：不再取value，而是取innerText ★★★
-        const shiftDisplay = document.getElementById('res_shift').innerText;
-        html += `<div class="pdf-kpi-card" style="background:#e74c3c"><div class="pdf-kpi-title">🏆 今日总需求</div><div class="pdf-kpi-val">${document.getElementById('res_total').innerText}</div><div class="pdf-kpi-sub">班次时长: ${shiftDisplay} H</div></div>`;
-        html += `</div>`;
+        html += `<div class="pdf-kpi-card" style="background:#e74c3c"><div class="pdf-kpi-title">🏆 今日总需求</div><div class="pdf-kpi-val">${getTxt('res_total')}</div><div class="pdf-kpi-sub">班次时长: ${getTxt('res_shift')} H</div></div></div>`;
 
         let staffInfo = "";
         if(currentProject === 'roche') {
-            staffInfo = `❄️冷链(在${document.getElementById('base_roche_cold').value}/实${document.getElementById('fc_roche_cold').value})  ☀️常温(在${document.getElementById('base_roche_amb').value}/实${document.getElementById('fc_roche_amb').value})`;
+            staffInfo = `❄️冷链(在${getVal('base_roche_cold')}/实${getVal('fc_roche_cold')})  ☀️常温(在${getVal('base_roche_amb')}/实${getVal('fc_roche_amb')})`;
         } else if (currentProject === 'device') {
-            staffInfo = `⚙️器械(在${document.getElementById('base_device').value}/实${document.getElementById('fc_device').value})`;
+            staffInfo = `⚙️器械(在${getVal('base_device')}/实${getVal('fc_device')})`;
         } else {
-            staffInfo = `🌿药品(在${document.getElementById('base_medicine').value}/实${document.getElementById('fc_medicine').value})`;
+            staffInfo = `🌿药品(在${getVal('base_medicine')}/实${getVal('fc_medicine')})`;
         }
+        html += `<div class="pdf-resource-bar"><div class="pdf-res-item">基础参数: <strong>Eff ${getVal('eff')} / OEE ${getVal('oee')}</strong></div><div class="pdf-res-item">正式工现状: <strong>${staffInfo}</strong></div></div><div class="pdf-details-grid">`;
 
-        html += `
-            <div class="pdf-resource-bar">
-                <div class="pdf-res-item">基础参数: <strong>Eff ${document.getElementById('eff').value} / OEE ${document.getElementById('oee').value}</strong></div>
-                <div class="pdf-res-item">正式工现状: <strong>${staffInfo}</strong></div>
-            </div>
-        `;
-
-        html += `<div class="pdf-details-grid">`;
         const activeView = document.getElementById('view-' + currentProject);
         const cols = activeView.querySelectorAll('.col'); 
-        
         cols.forEach(col => {
             html += `<div class="pdf-grid-col">`;
             const sectionTitle = col.querySelector('div[style*="font-weight:bold"]').innerText;
             html += `<div class="pdf-col-title">${sectionTitle}</div>`;
-            
             col.querySelectorAll('.card').forEach(card => {
                 const groupName = card.querySelector('h4').innerText;
                 let groupHtml = `<div class="pdf-task-group"><div class="pdf-group-name">${groupName}</div>`;
                 let hasItem = false;
-                
                 card.querySelectorAll('.data-input').forEach(input => {
                     if(parseInt(input.value) > 0) {
                         hasItem = true;
-                        const taskName = input.previousElementSibling.innerText;
-                        groupHtml += `<div class="pdf-task-item"><span class="pdf-task-name">${taskName}</span><span>${input.value}</span></div>`;
+                        groupHtml += `<div class="pdf-task-item"><span class="pdf-task-name">${input.previousElementSibling.innerText}</span><span>${input.value}</span></div>`;
                     }
                 });
                 groupHtml += `</div>`;
@@ -760,39 +1278,59 @@
             });
             html += `</div>`;
         });
-        html += `</div>`;
-
-        html += `<div class="pdf-chart-section"><div class="pdf-chart-title">📈 人力分布推荐 (人)</div>`;
-        html += document.getElementById('chart-area').innerHTML;
-        html += `</div>`;
-
+        html += `</div><div class="pdf-chart-section"><div class="pdf-chart-title">📈 人力分布推荐 (人)</div>${document.getElementById('chart-area').innerHTML}</div>`;
         pdfContainer.innerHTML = html;
 
         try {
-            const canvas = await html2canvas(pdfContainer, { scale: 2 });
-            const imgData = canvas.toDataURL('image/png');
+            const canvas1 = await html2canvas(pdfContainer, { scale: 2 });
+            const imgData1 = canvas1.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgWidth = 210;
-            const imgHeight = canvas.height * imgWidth / canvas.width;
-            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            const pageWidth = 210;
+            pdf.addImage(imgData1, 'PNG', 0, 0, pageWidth, canvas1.height * pageWidth / canvas1.width);
+
+            if (schedulerImgData) {
+                pdf.addPage();
+                const contentWidth = 190;
+                const contentHeight = schedulerRatio * contentWidth;
+                pdf.addImage(schedulerImgData, 'PNG', 10, 10, contentWidth, contentHeight);
+            }
             pdf.save(`${currentProject}_人力日报_${dateStr}.pdf`);
         } catch (e) {
-            alert("PDF 生成失败，请检查网络 (需加载生成库)");
+            console.error(e);
+            alert("PDF 生成遇到错误，请重试。");
         } finally {
-            document.getElementById('pdf-msg').style.display = 'none';
+            if(msgEl) msgEl.style.display = 'none';
             pdfContainer.innerHTML = ''; 
         }
     }
 
+/* === V16.1 生成带排班数据的链接 === */
     function generateLink() {
         const params = new URLSearchParams();
+        
+        // 1. 保存业务数据 (数字)
         document.querySelectorAll('input, select').forEach(el => {
             if (el.value != 0 && el.id) params.set(el.id, el.value);
         });
+
+        // 2. 保存人员排班数据 (JSON -> 压缩编码)
+        // 注意：只保存有人的数据，减小链接长度
+        try {
+            const jsonStr = JSON.stringify(staffData);
+            // 使用 encodeURIComponent 处理中文，btoa 转为 Base64
+            const compressed = btoa(encodeURIComponent(jsonStr));
+            params.set('sdata', compressed);
+        } catch (e) {
+            console.error("排班数据编码失败", e);
+        }
+
         const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?" + params.toString();
+        
         navigator.clipboard.writeText(newUrl).then(() => {
             document.getElementById('link-msg').style.display = 'block';
             setTimeout(() => { document.getElementById('link-msg').style.display = 'none'; }, 3000);
+        }).catch(err => {
+            alert("复制失败，可能是链接太长了");
         });
     }
 
