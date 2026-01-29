@@ -216,8 +216,9 @@
         .staff-card { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; cursor: grab; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); user-select: none; position: relative; height: 24px; }
         .staff-card:active { cursor: grabbing; transform: scale(1.05); }
         .staff-type-1 { background: #3498db; }
-        .staff-type-2 { background: #27ae60; }
-        .staff-type-3 { background: #f1c40f; color: #333; }
+        .staff-type-2 { background: #9b59b6; }
+        .staff-type-3 { background: #27ae60; }
+        .staff-type-4 { background: #f1c40f; color: #333; }
         .staff-delete { display: none; width: 16px; height: 16px; background: rgba(0,0,0,0.2); border-radius: 50%; text-align: center; line-height: 14px; font-size: 10px; cursor: pointer; margin-left: 5px; }
         .staff-card:hover .staff-delete { display: inline-block; }
         
@@ -251,7 +252,7 @@
         /* 主体容器：左右布局，撑满 */
         .pdf-mode-active .schedule-board {
             width: 100% !important;
-            padding: 20px 40px !important;
+            padding: 20px 80px 20px 0px !important;
             margin: 0 !important;
             background: white !important;
             display: flex !important; /* Flex 布局 */
@@ -597,8 +598,9 @@
                     <textarea id="new-staff-names" placeholder="批量添加姓名 (空格隔开)"></textarea>
                     <div style="margin-bottom:5px;">
                         <label class="type-radio"><input type="radio" name="staffType" value="1" checked>🟦管理</label>
-                        <label class="type-radio"><input type="radio" name="staffType" value="2">🟩一线</label>
-                        <label class="type-radio"><input type="radio" name="staffType" value="3">🟨临时</label>
+                        <label class="type-radio"><input type="radio" name="staffType" value="2">🟪文员</label>
+                        <label class="type-radio"><input type="radio" name="staffType" value="3">🟩一线</label>
+                        <label class="type-radio"><input type="radio" name="staffType" value="4">🟨临时</label>
                     </div>
                     <button class="btn" onclick="addNewStaff()" style="margin:0; padding:6px; background:#2c3e50;">➕ 批量入池</button>
                 </div>
@@ -1188,7 +1190,8 @@
             </div>
             <div style="padding: 10px 40px 30px 40px; background: #fff; color: #555; font-size: 14px; display: flex; justify-content: center; gap: 30px; align-items: center;">
                 <strong style="font-size:16px;">图例：</strong> 
-                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#3498db; margin-right:6px; border-radius:3px;"></span> 管理/文员</span>
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#3498db; margin-right:6px; border-radius:3px;"></span> 管理</span>
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#9b59b6; margin-right:6px; border-radius:3px;"></span> 文员</span>
                 <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#27ae60; margin-right:6px; border-radius:3px;"></span> 一线员工</span>
                 <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#f1c40f; margin-right:6px; border-radius:3px;"></span> 临时工</span>
                 <span style="display:flex; align-items:center; margin-left:10px;"><span style="width:16px; height:16px; background:#e74c3c; margin-right:6px; border-radius:3px;"></span> 缺口</span>
@@ -1203,7 +1206,7 @@
                 scale: 1.5, 
                 useCORS: true, 
                 backgroundColor: '#ffffff',
-                windowWidth: 1400,
+                windowWidth: 1650,
                 height: schedulerContent.scrollHeight
             });
             schedulerImgData = canvas2.toDataURL('image/png');
