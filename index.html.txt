@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天马园区 | 综合人力排班决策模型</title>
+    <meta name="robots" content="noindex, nofollow">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #FDFCFB;
+            --text-main: #2C3E50;
+            --text-sub: #7F8C8D;
+            --border-color: #E0E0E0;
+            
+            /* 莫兰迪配色 */
+            --roche-blue: #77929F;
+            --roche-sand: #D4C4B7;
+            --device-green: #9CAF88;
+            --medicine-purple: #95A5A6; 
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "Heiti SC", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            height: 100vh;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            width: 340px;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            height: 100%;
+            overflow-y: auto;
+            flex-shrink: 0;
+            scrollbar-width: thin;
+        }
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 3px; }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        h1 { font-size: 24px; color: #5C6E7D; margin: 0 0 5px 0; }
+        h3 { font-size: 15px; margin: 15px 0 10px 0; color: var(--text-main); font-weight: bold; }
+        h4 { font-size: 15px; margin: 0 0 10px 0; font-weight: bold; }
+
+        label { display: block; margin-top: 10px; font-size: 13px; color: #555; font-weight: 500; }
+        
+        input[type="range"] { width: 100%; cursor: pointer; }
+        input[type="number"], select {
+            width: 100%;
+            padding: 6px 8px;
+            margin-top: 4px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 13px;
+        }
+        
+        /* 只读输入框样式 */
+        .input-readonly { background-color: #e9ecef; color: #555; font-weight: bold; border: 1px solid #ced4da; cursor: not-allowed; }
+
+        .staff-calc-group { background-color: #f9f9f9; padding: 12px; border-radius: 6px; border: 1px solid #eee; margin-bottom: 15px; }
+        .staff-calc-group h5 { margin: 0 0 8px 0; font-size: 13px; color: #333; border-bottom: 1px dashed #ccc; padding-bottom: 5px; }
+        .calc-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .calc-row label { margin: 0; font-size: 12px; color: #666; }
+        .calc-row input { width: 70px; text-align: right; }
+        .calc-result-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e0e0e0; }
+        .calc-result-row label { font-weight: bold; color: #333; }
+        .calc-result-row input { color: #2980b9; width: 70px; text-align: right; font-weight: bold; }
+
+        #project-select { padding: 10px; font-size: 16px; color: white; background-color: var(--roche-blue); border: none; border-radius: 6px; margin-bottom: 20px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        #project-select option { background-color: white; color: #333; }
+
+        .columns { display: flex; gap: 20px; flex-wrap: wrap; }
+        .col { flex: 1; min-width: 320px; }
+
+        .card { background: white; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px; transition: box-shadow 0.2s; }
+        .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+        .view-roche .card-header-cold { border-left: 5px solid var(--roche-blue); padding-left: 10px; margin-bottom: 15px; }
+        .view-roche .card-header-amb { border-left: 5px solid var(--roche-sand); padding-left: 10px; margin-bottom: 15px; }
+        .view-device .card-header { border-left: 5px solid var(--device-green); padding-left: 10px; margin-bottom: 15px; }
+        .view-medicine .card-header { border-left: 5px solid var(--medicine-purple); padding-left: 10px; margin-bottom: 15px; }
+
+        .dashboard { display: flex; gap: 15px; width: 100%; flex-wrap: nowrap; align-items: stretch; flex-shrink: 0; }
+        #dash-roche-group { display: flex; gap: 15px; flex: 2; }
+        #dash-device-group, #dash-medicine-group { flex: 2; display: flex; }
+        .dash-card { flex: 1; padding: 15px 5px; background: white; border-radius: 8px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); min-width: 0; }
+        .dash-total { flex: 1; border-top: 5px solid #C6A4A4; background: #FFF9F9; }
+
+        .metric-val { font-size: 28px; font-weight: bold; margin: 5px 0; white-space: nowrap; }
+        .metric-sub { font-size: 12px; color: var(--text-sub); }
+
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        
+        /* 底部图表 */
+        .chart-container { background: white; padding: 25px; border-radius: 8px; margin-top: 20px; border: 1px solid var(--border-color); }
+        .chart-row { display: flex; align-items: center; margin-bottom: 10px; font-size: 13px; }
+        .chart-label { width: 200px; text-align: right; padding-right: 15px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+        .chart-bar-area { flex: 1; background: #f0f0f0; height: 24px; border-radius: 4px; overflow: hidden; }
+        .chart-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; color: white; font-size: 12px; white-space: nowrap;}
+        .chart-val { width: 120px; padding-left: 10px; font-weight: bold; color: #333; flex-shrink: 0; text-align: left; }
+
+        .hidden { display: none !important; }
+        
+        .btn { background-color: #5C6E7D; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 20px; margin-bottom: 30px; font-weight: bold; font-size: 14px; transition: all 0.2s; }
+        .btn:hover { background-color: #4a5a6a; transform: translateY(-1px); }
+        .btn-link { margin-top: 10px; font-size: 12px; padding: 8px; color: white; border-radius: 4px; cursor: pointer; border: none; font-weight: bold; }
+        
+        /* 清除按钮样式 */
+        .btn-clear { background-color: white; color: #c0392b; border: 1px solid #e74c3c; margin-bottom: 10px; }
+        .btn-clear:hover { background-color: #fcebe9; transform: translateY(-1px); }
+
+        /* PDF 隐藏域 */
+        #pdf-container { position: fixed; left: -9999px; top: 0; width: 900px; background: white; padding: 40px; box-sizing: border-box; font-family: "Microsoft YaHei", sans-serif; color: #333; }
+        .pdf-header { border-bottom: 4px solid #5C6E7D; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .pdf-title { font-size: 26px; font-weight: bold; color: #2C3E50; }
+        .pdf-date { font-size: 14px; color: #7F8C8D; }
+        .pdf-decision-row { display: flex; gap: 20px; margin-bottom: 20px; }
+        .pdf-kpi-card { flex: 1; padding: 15px; border-radius: 6px; text-align: center; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .pdf-kpi-title { font-size: 14px; opacity: 0.9; margin-bottom: 5px; }
+        .pdf-kpi-val { font-size: 32px; font-weight: bold; }
+        .pdf-kpi-sub { font-size: 12px; opacity: 0.8; margin-top: 5px; }
+        .pdf-resource-bar { background: #f4f6f7; border: 1px solid #ddd; border-radius: 6px; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-size: 13px; }
+        .pdf-res-item strong { color: #2C3E50; }
+        .pdf-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 20px; align-items: start; }
+        .pdf-col-title { font-size: 16px; font-weight: bold; color: #5C6E7D; border-bottom: 2px solid #eee; padding-bottom: 8px; margin-bottom: 10px; }
+        .pdf-task-group { margin-bottom: 12px; break-inside: avoid; }
+        .pdf-group-name { font-size: 13px; font-weight: bold; color: #2C3E50; margin-bottom: 4px; background:#eef; padding:2px 5px; display:inline-block; border-radius:3px; }
+        .pdf-task-item { display: flex; justify-content: space-between; font-size: 12px; color: #555; border-bottom: 1px dashed #eee; padding: 3px 0; }
+        .pdf-task-name { font-weight: 500; }
+        .pdf-chart-section { margin-top: 20px; border-top: 2px solid #eee; padding-top: 15px; }
+        .pdf-chart-title { font-size: 14px; font-weight: bold; color: #7F8C8D; margin-bottom: 10px; }
+
+        /* === 排班沙盘样式 (V14.1 滚动条优化版) === */
+        .scheduler-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .scheduler-content { width: 95%; height: 90%; background: #fdfcfb; border-radius: 12px; display: flex; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; border: 4px solid white; }
+        .res-pool-panel { width: 280px; background: #eaeded; padding: 15px; display: flex; flex-direction: column; border-right: 2px solid #ccc; flex-shrink: 0; }
+        .pool-container { flex: 1; background: white; border: 2px dashed #bdc3c7; border-radius: 6px; padding: 10px; overflow-y: auto; align-content: flex-start; display: flex; flex-wrap: wrap; gap: 8px; }
+        .schedule-board { flex: 1; padding: 20px; overflow-y: auto; background: white; display: flex; gap: 20px; }
+        .schedule-col { flex: 1; display: flex; flex-direction: column; gap: 15px; height: 100%; }
+        
+        .schedule-zone { 
+            background: #f8f9fa;
+            border: 2px dashed #dcdfe6; 
+            border-radius: 8px; 
+            padding: 10px; 
+            display: flex; 
+            flex-direction: column;
+        }
+        
+        /* 内部放小人的盒子：基础样式 (V15.4 修复版) */
+        .zone-box { 
+            background: transparent;
+            border: none !important; /* ★ 修复：去掉内边框 */
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 8px; 
+            align-content: flex-start; 
+            width: 100% !important;  /* ★ 修复：强制撑开 */
+            padding-right: 5px;
+        }
+        
+        /* 本组出勤 (淡紫色 + 大空间 + 滚动条) */
+        .zone-base-container .schedule-zone { 
+            background: #f3e5f5;
+            border-color: #ce93d8; flex: 2; 
+        }
+        .zone-base-container .zone-box {
+            min-height: 250px;
+            max-height: 450px; overflow-y: auto;
+        }
+
+        /* 支援人员 (淡橙色 + 较小空间) */
+        .zone-sup-container .schedule-zone { 
+            background: #fff3e0;
+            border-color: #ffcc80; flex: 1; 
+        }
+        .zone-sup-container .zone-box {
+            min-height: 100px;
+            max-height: 150px; overflow-y: auto;
+        }
+
+        /* 缺口区域 */
+        .zone-gap-container .schedule-zone {
+            background: #fff0f0;
+            border-color: #fadbd8; flex: 0 0 auto;
+        }
+        .zone-gap-container .zone-box {
+            min-height: 60px;
+        }
+
+        .zone-title { font-weight: bold; margin-bottom: 8px; font-size: 14px; display: flex; justify-content: space-between; color: #555; }
+        .zone-box::-webkit-scrollbar { width: 6px; }
+        .zone-box::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 3px; }
+        
+        /* 人员卡片 */
+        .staff-card { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; cursor: grab; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); user-select: none; position: relative; height: 24px; }
+        .staff-card:active { cursor: grabbing; transform: scale(1.05); }
+        .staff-type-1 { background: #3498db; }
+        .staff-type-2 { background: #9b59b6; }
+        .staff-type-3 { background: #27ae60; }
+        .staff-type-4 { background: #f1c40f; color: #333; }
+        .staff-delete { display: none; width: 16px; height: 16px; background: rgba(0,0,0,0.2); border-radius: 50%; text-align: center; line-height: 14px; font-size: 10px; cursor: pointer; margin-left: 5px; }
+        .staff-card:hover .staff-delete { display: inline-block; }
+        
+        .gap-block { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; background: #e74c3c; opacity: 0.8; border: 1px dashed white; cursor: not-allowed; }
+        .add-staff-area { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #ccc; }
+        .add-staff-area textarea { width: 100%; height: 60px; margin-bottom: 5px; font-size: 12px; padding: 5px; border-radius: 4px; border:1px solid #ccc; }
+        .type-radio { font-size: 12px; margin-right: 8px; cursor: pointer; }
+
+        /* === V15.3 终极 PDF 报表样式 (宽屏截图适配) === */
+        .pdf-mode-active {
+            display: block !important;
+            background: white !important;
+            box-shadow: none !important;
+            border: none !important;
+            padding: 0 !important;
+            position: absolute !important;
+            top: 0;
+            left: 0;
+            z-index: -9999;
+            min-width: 1280px !important; /* 强制宽屏 */
+        }
+        
+        /* 隐藏杂项 */
+        .pdf-mode-active .res-pool-panel,
+        .pdf-mode-active .add-staff-area,
+        .pdf-mode-active .staff-delete,
+        .pdf-mode-active .scheduler-content > button { 
+            display: none !important;
+        }
+
+        /* 主体容器：左右布局，撑满 */
+        .pdf-mode-active .schedule-board {
+            width: 100% !important;
+            padding: 20px 80px 20px 0px !important;
+            margin: 0 !important;
+            background: white !important;
+            display: flex !important;
+            /* Flex 布局 */
+            gap: 30px !important;
+            align-items: flex-start !important;
+        }
+
+        .pdf-mode-active #sched-view-roche {
+            display: flex !important;
+            flex-direction: row !important; /* 左右排列 */
+            width: 100% !important;
+            gap: 30px !important;
+        }
+
+        .pdf-mode-active .schedule-col {
+            flex: 1 !important;
+            border: none !important;
+            padding: 0 !important;
+            height: auto !important;
+            width: auto !important;
+        }
+
+        /* 盒子全展开 */
+        .pdf-mode-active .schedule-zone,
+        .pdf-mode-active .zone-box {
+            max-height: none !important;
+            min-height: 80px !important;
+            overflow: visible !important;
+            height: auto !important;
+            display: flex !important;
+            flex-wrap: wrap !important;
+            background: #fff !important;
+            border: 1px solid #ddd !important;
+            margin-bottom: 15px;
+        }
+
+        .pdf-mode-active .zone-gap-container {
+            display: block !important;
+            height: auto !important;
+        }
+
+        .pdf-mode-active h3 {
+            color: #2c3e50 !important;
+            border-bottom: 2px solid #7f8c8d;
+            padding-bottom: 10px;
+            margin-top: 0 !important;
+            margin-bottom: 20px;
+            font-size: 20px !important;
+            text-align: center;
+        }
+
+        @media print {
+            body { height: auto; overflow: visible; display: block; }
+            .sidebar, .btn { display: none; }
+            .chart-container { break-inside: avoid; }
+            .main-content { height: auto; overflow: visible; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <label style="margin-top:0">📊 选择项目组</label>
+        <select id="project-select" onchange="switchView()">
+            <option value="roche_cold">❄️ 罗诊冷库</option>
+            <option value="roche_amb">☀️ 罗诊常温</option>
+            <option value="device">⚙️ 器械</option>
+            <option value="medicine">🌿 药品</option>
+        </select>
+
+        <h2>⚙️ 决策参数</h2>
+ 
+        <label>效率系数 <span id="disp_eff" style="float:right; font-weight:bold;">1.00</span></label>
+        <input type="range" id="eff" min="0.1" max="1.0" step="0.05" value="1.0" oninput="update()">
+        <label>有效作业率 <span id="disp_oee" style="float:right; font-weight:bold;">1.00</span></label>
+        <input type="range" id="oee" min="0.1" max="1.0" step="0.05" value="1.0" oninput="update()">
+        
+        <div style="margin-bottom:15px; margin-top:15px;">
+            <label>⏱️ 班次时长</label>
+            <div id="shift_roche_cold_div" style="display:none; justify-content:space-between; margin-bottom:5px;">
+                <span style="font-size:12px; color:#666; line-height:28px;">❄️冷库:</span>
+                <input type="number" id="shift_roche_cold" value="8" min="1" max="24" step="0.5" oninput="update()" style="width:60px; text-align:right;">
+            </div>
+            <div id="shift_roche_amb_div" style="display:none; justify-content:space-between; margin-bottom:5px;">
+                <span style="font-size:12px; color:#666; line-height:28px;">☀️常温:</span>
+                <input type="number" id="shift_roche_amb" value="8" min="1" max="24" step="0.5" oninput="update()" style="width:60px; text-align:right;">
+            </div>
+            <div id="shift_device_div" style="display:none; justify-content:space-between; margin-bottom:5px;">
+                <span style="font-size:12px; color:#666; line-height:28px;">⚙️器械:</span>
+                <input type="number" id="shift_device" value="8" min="1" max="24" step="0.5" oninput="update()" style="width:60px; text-align:right;">
+            </div>
+            <div id="shift_medicine_div" style="display:none; justify-content:space-between; margin-bottom:5px;">
+                <span style="font-size:12px; color:#666; line-height:28px;">🌿药品:</span>
+                <input type="number" id="shift_medicine" value="8" min="1" max="24" step="0.5" oninput="update()" style="width:60px; text-align:right;">
+            </div>
+        </div>
+
+        <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
+            <h3>👥 正式工出勤计算</h3>
+            <button class="btn" onclick="openScheduler()" style="margin: 5px 0 15px 0; background: #8e44ad; padding: 8px; font-size: 13px;">🧩 打开人员排班沙盘 (点名)</button>
+            
+            <div id="formal-roche">
+                <div id="formal-roche-cold-group" class="staff-calc-group">
+                    <h5>❄️ 罗诊冷库组</h5>
+                    <div class="calc-row">
+                        <label>🏠 本组出勤</label>
+                        <input type="number" id="base_roche_cold" class="staff-base input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
+                    <div class="calc-row">
+                        <label>🟧 派来支援</label>
+                        <input type="number" id="sup_roche_cold" class="staff-dynamic input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
+                    <div class="calc-result-row"><label>〓 实际可用</label><input type="number" id="fc_roche_cold" class="input-readonly" readonly value="0"></div>
+                </div>
+                <div id="formal-roche-amb-group" class="staff-calc-group">
+                    <h5>☀️ 罗诊常温组</h5>
+                    <div class="calc-row">
+                        <label>🏠 本组出勤</label>
+                        <input type="number" id="base_roche_amb" class="staff-base input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
+                    <div class="calc-row">
+                        <label>🟧 派来支援</label>
+                        <input type="number" id="sup_roche_amb" class="staff-dynamic input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
+                    <div class="calc-result-row"><label>〓 实际可用</label><input type="number" id="fc_roche_amb" class="input-readonly" readonly value="0"></div>
+                </div>
+            </div>
+            
+            <div id="formal-device" class="hidden">
+                <div class="staff-calc-group">
+                    <h5>⚙️ 器械组</h5>
+                    <div class="calc-row">
+                        <label>🏠 本组出勤</label>
+                        <input type="number" id="base_device" class="staff-base input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
+                    <div class="calc-row">
+                        <label>🟧 派来支援</label>
+                        <input type="number" id="sup_device" class="staff-dynamic input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
+                    <div class="calc-result-row"><label>〓 实际可用</label><input type="number" id="fc_device" class="input-readonly" readonly value="0"></div>
+                </div>
+            </div>
+
+            <div id="formal-medicine" class="hidden">
+                <div class="staff-calc-group">
+                    <h5>🌿 药品组</h5>
+                    <div class="calc-row">
+                        <label>🏠 本组出勤</label>
+                        <input type="number" id="base_medicine" class="staff-base input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
+                    <div class="calc-row">
+                        <label>🟧 派来支援</label>
+                        <input type="number" id="sup_medicine" class="staff-dynamic input-readonly" readonly style="pointer-events: none; background-color: #e9ecef;" min="0" value="0">
+                    </div>
+                    <div class="calc-result-row"><label>〓 实际可用</label><input type="number" id="fc_medicine" class="input-readonly" readonly value="0"></div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px;">
+            
+            <div style="display:flex; gap:10px; margin-bottom: 10px;">
+                <button class="btn btn-clear" style="flex:1; margin-bottom:0; font-size:12px; padding: 10px 5px;" onclick="clearData(false)">🗑️ 清空[当前组]业务量</button>
+                <button class="btn btn-clear" style="flex:1; margin-bottom:0; font-size:12px; padding: 10px 5px;" onclick="clearData(true)">🗑️ 清空[所有]业务量</button>
+            </div>
+
+            <button class="btn" onclick="generatePDF()" style="background-color: #e74c3c; margin-bottom: 10px;">📄 生成常规汇报 PDF</button>
+            
+            <button class="btn" id="btn-combined-pdf" onclick="generateCombinedPDF()" style="background-color: #8e44ad; margin-top: 0px; margin-bottom: 10px; display: none;">📄 生成常温+冷库联合版 PDF</button>
+
+            <div id="pdf-msg" style="font-size:12px; color:#c0392b; text-align:center; display:none;">生成中，请稍候...</div>
+            
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-link" style="flex:1; margin-top:10px; background-color:#27ae60;" onclick="generateLink(false)">🔗 生成[当前组]纯净链接</button>
+                <button class="btn btn-link" style="flex:1; margin-top:10px; background-color:#95a5a6;" onclick="generateLink(true)">🔗 生成[全量]联合链接</button>
+            </div>
+            
+            <div id="link-msg" style="font-size:12px; color:#27ae60; text-align:center; display:none; margin-top:5px;">链接已复制</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+            <div>
+                <h1 id="page-title">罗诊冷库项目人力排班决策模型</h1>
+            </div>
+            <div style="text-align:right;">
+                <h3 id="currentDate" style="color:#5C6E7D; margin:0;"></h3>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div id="dash-roche-group">
+                <div id="dash-roche-cold-card" class="dash-card" style="border-top: 5px solid var(--roche-blue); background: #F4F7F9;">
+                    <h4 style="color:#2C3E50">❄️ 冷库需求</h4>
+                    <div class="metric-val" id="res_roche_cold">0 人</div>
+                    <div class="metric-sub">缺口: <span id="gap_roche_cold">0.0</span> 小时</div>
+                </div>
+              
+                <div id="dash-roche-amb-card" class="dash-card" style="border-top: 5px solid var(--roche-sand); background: #F9F7F5; margin-left: 15px;">
+                    <h4 style="color:#5D5046">☀️ 常温需求</h4>
+                    <div class="metric-val" id="res_roche_amb">0 人</div>
+                    <div class="metric-sub">缺口: <span id="gap_roche_amb">0.0</span> 小时</div>
+                </div>
+            </div>
+  
+            <div id="dash-device-group" class="hidden">
+                <div class="dash-card" style="border-top: 5px solid var(--device-green); background: var(--device-bg); width: 100%;">
+                    <h4 style="color:#556B2F">⚙️ 器械组需求</h4>
+                    <div class="metric-val" id="res_device">0 人</div>
+                    <div class="metric-sub">缺口: <span id="gap_device">0.0</span> 小时</div>
+                </div>
+            </div>
+
+            <div id="dash-medicine-group" class="hidden">
+                <div class="dash-card" style="border-top: 5px solid var(--medicine-purple); background: var(--medicine-bg); width: 100%;">
+                    <h4 style="color:#555">🌿 药品组需求</h4>
+                    <div class="metric-val" id="res_medicine">0 人</div>
+                    <div class="metric-sub">缺口: <span id="gap_medicine">0.0</span> 小时</div>
+                </div>
+            </div>
+
+            <div class="dash-card dash-total">
+                <h4 style="color:#922B21">🏆 今日总需求</h4>
+                <div class="metric-val" style="color:#922B21" id="res_total">0 人</div>
+                <div class="metric-sub">班次: <span id="res_shift">8</span> 小时</div>
+            </div>
+        </div>
+
+        
+        <div id="view-roche" class="columns view-roche">
+            <div id="view-roche-cold-col" class="col">
+                <div style="background:var(--roche-blue); color:white; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold;">❄️ 罗诊冷库组</div>
+                <div class="card"><div class="card-header-cold"><h4>📦 罗诊冷库 (主营)</h4></div><div class="input-grid">
+                    <div class="input-item"><label>收货翻托/全检 (托)</label><input type="number" class="data-input" data-uph="2.5" id="c_ft"></div>
+                    <div class="input-item"><label>收货上架 (条)</label><input type="number" class="data-input" data-uph="20" id="c_sj"></div>
+                    <div class="input-item"><label>发货拣货 (条)</label><input type="number" class="data-input" data-uph="20" id="c_jh"></div>
+                    <div class="input-item"><label>扫描包装 (盒)</label><input type="number" class="data-input" data-uph="110" id="c_bz"></div>
+                    <div class="input-item"><label>拆小蓝箱 (个)</label><input type="number" class="data-input" data-uph="13" id="c_lx"></div>
+                    <div class="input-item"><label>温度计下载 (个)</label><input type="number" class="data-input" data-uph="30" id="c_lxx"></div>
+                </div></div>
+  
+                <div class="card"><div class="card-header-cold"><h4>🧊 安捷伦(冷库)</h4></div><div class="input-grid">
+                    <div class="input-item"><label>收货上架 (条)</label><input type="number" class="data-input" data-uph="20" id="ag_sj"></div>
+                    <div class="input-item"><label>发货拣货 (条)</label><input type="number" class="data-input" data-uph="20" id="ag_jh"></div>
+                    <div class="input-item"><label>扫描包装 (盒)</label><input type="number" class="data-input" data-uph="75" id="ag_bz"></div>
+                </div></div>
+
+                <div class="card"><div class="card-header-cold"><h4>🧊 豪洛捷(冷库)</h4></div><div class="input-grid">
+                    <div class="input-item"><label>收货上架 (条)</label><input type="number" class="data-input" data-uph="20" id="ho_sj"></div>
+                    <div class="input-item"><label>发货拣货 (条)</label><input type="number" class="data-input" data-uph="20" id="ho_jh"></div>
+                </div></div>
+
+                <div class="card"><div class="card-header-cold"><h4>🧊 罗诊自营</h4></div><div class="input-grid">
+                    <div class="input-item"><label>收货上架 (条)</label><input type="number" class="data-input" data-uph="20" id="se_sj"></div>
+                    <div class="input-item"><label>发货拣货 (条)</label><input type="number" class="data-input" data-uph="20" id="se_jh"></div>
+                    <div class="input-item"><label>扫描包装 (盒)</label><input type="number" class="data-input" data-uph="75" id="se_bz"></div>
+                </div></div>
+
+                <div class="card"><div class="card-header-cold"><h4>🔍 动态盘点</h4></div><div class="input-grid">
+                    <div class="input-item"><label>冷库盘点 (条)</label><input type="number" class="data-input" data-uph="20" id="c_pd"></div>
+                </div></div>
+            </div>
+            
+            <div id="view-roche-amb-col" class="col">
+                <div style="background:var(--roche-sand); color:#5D5046; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold;">☀️ 罗诊常温组</div>
+                <div class="card"><div class="card-header-amb"><h4>🧪 罗氏试剂</h4></div><div class="input-grid">
+                    <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="r_sj"></div>
+                    <div class="input-item"><label>取货 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="r_qh"></div>
+                    <div class="input-item"><label>扫描包装 (盒)</label><input type="number" class="data-input" data-uph="120" data-subtype="amb" id="r_bz"></div>
+                    <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="r_zc"></div>
+                </div></div>
+                <div class="card"><div class="card-header-amb"><h4>🔬 罗氏仪器</h4></div><div class="input-grid">
+                    <div class="input-item"><label>国内到货清点 (盒)</label><input type="number" class="data-input" data-uph="80" data-subtype="amb" id="i_qd"></div>
+                    <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="i_sj"></div>
+                    <div class="input-item"><label>取货 (条)</label><input type="number" class="data-input" data-uph="10" data-subtype="amb" id="i_qh"></div>
+                    <div class="input-item"><label>扫描包装 (件)</label><input type="number" class="data-input" data-uph="50" data-subtype="amb" id="i_bz"></div>
+                    <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="i_zc"></div>
+                </div></div>
+                <div class="card"><div class="card-header-amb"><h4>📦 罗诊2方</h4></div><div class="input-grid">
+                    <div class="input-item"><label>到货清点 (件)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="p2_qd"></div>
+                    <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="p2_sj"></div>
+                    <div class="input-item"><label>下架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="p2_xj"></div>
+                    <div class="input-item"><label>包装 (件)</label><input type="number" class="data-input" data-uph="100" data-subtype="amb" id="p2_bz"></div>
+                    <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="p2_zc"></div>
+                </div></div>
+                <div class="card"><div class="card-header-amb"><h4>🦷 士卓曼</h4></div><div class="input-grid">
+                    <div class="input-item"><label>到货清点 (件)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="st_qd"></div>
+                    <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="st_sj"></div>
+                    <div class="input-item"><label>下架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="st_xj"></div>
+                    <div class="input-item"><label>包装 (件)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="st_bz"></div>
+                    <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="st_zc"></div>
+                </div></div>
+                <div class="card"><div class="card-header-amb"><h4>😷 防疫物资</h4></div><div class="input-grid">
+                    <div class="input-item"><label>到货清点 (件)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="fy_qd"></div>
+                    <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="fy_sj"></div>
+                    <div class="input-item"><label>下架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="fy_xj"></div>
+                    <div class="input-item"><label>包装 (件)</label><input type="number" class="data-input" data-uph="400" data-subtype="amb" id="fy_bz"></div>
+                    <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="fy_zc"></div>
+                </div></div>
+                <div class="card"><div class="card-header-amb"><h4>🏥 迈瑞</h4></div><div class="input-grid">
+                    <div class="input-item"><label>到货清点 (件)</label><input type="number" class="data-input" data-uph="100" data-subtype="amb" id="mr_qd"></div>
+                    <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="mr_sj"></div>
+                    <div class="input-item"><label>下架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="mr_xj"></div>
+                    <div class="input-item"><label>包装 (件)</label><input type="number" class="data-input" data-uph="100" data-subtype="amb" id="mr_bz"></div>
+                    <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="mr_zc"></div>
+                </div></div>
+                <div class="card"><div class="card-header-amb"><h4>🔄 其他</h4></div><div class="input-grid">
+                    <div class="input-item"><label>常温退货 (条)</label><input type="number" class="data-input" data-uph="2" data-subtype="amb" id="oth_th"></div>
+                    <div class="input-item"><label>常温盘点 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="oth_pd"></div>
+                </div></div>
+            </div>
+        </div>
+
+        <div id="view-device" class="columns view-device hidden">
+            <div class="col">
+                <div style="background:var(--device-green); color:white; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold;">⚙️ 器械项目组</div>
+                <div class="card"><div class="card-header"><h4>🔩 专项操作 (专项/墨尼克/锐适)</h4></div><div class="input-grid">
+                    <div class="input-item"><label>专项到货清点 (件)</label><input type="number" class="data-input device-input" data-uph="200" id="d_sp_qd"></div>
+                    <div class="input-item"><label>墨尼克翻托 (托)</label><input type="number" class="data-input device-input" data-uph="20" id="d_mnk_ft"></div>
+                    <div class="input-item"><label>墨尼克包装 (盒)</label><input type="number" class="data-input device-input" data-uph="50" id="d_mnk_bz"></div>
+                    <div class="input-item"><label>锐适组合件 (盒)</label><input type="number" class="data-input device-input" data-uph="50" id="d_rs_bom"></div>
+                </div></div>
+                <div class="card"><div class="card-header"><h4>🛠️ 器械通用操作</h4></div><div class="input-grid">
+                    <div class="input-item"><label>收货上架 (条)</label><input type="number" class="data-input device-input" data-uph="15" id="d_sj"></div>
+                    <div class="input-item"><label>发货下架 (条)</label><input type="number" class="data-input device-input" data-uph="15" id="d_xj"></div>
+                    <div class="input-item"><label>扫描包装 (盒)</label><input type="number" class="data-input device-input" data-uph="50" id="d_bz"></div>
+                    <div class="input-item"><label>贴标 (盒)</label><input type="number" class="data-input device-input" data-uph="100" id="d_tb"></div>
+                </div></div>
+            </div>
+        </div>
+
+        <div id="view-medicine" class="columns view-medicine hidden">
+            <div class="col">
+                <div style="background:var(--medicine-purple); color:white; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold;">🌿 药品项目组</div>
+                <div class="card"><div class="card-header"><h4>💊 药品基础作业</h4></div><div class="input-grid">
+                    <div class="input-item"><label>收货上架 (条)</label><input type="number" class="data-input medicine-input" data-uph="12" id="p_sj"></div>
+                    <div class="input-item"><label>发货下架 (条)</label><input type="number" class="data-input medicine-input" data-uph="12" id="p_xj"></div>
+                    <div class="input-item"><label>扫描包装 (条)</label><input type="number" class="data-input medicine-input" data-uph="7" id="p_bz"></div>
+                    <div class="input-item"><label>贴标 (盒)</label><input type="number" class="data-input medicine-input" data-uph="200" id="p_tb"></div>
+                </div></div>
+                <div class="card"><div class="card-header"><h4>🏗️ 药品专项作业</h4></div><div class="input-grid">
+                    <div class="input-item"><label>罗贸&罗药翻托 (托)</label><input type="number" class="data-input medicine-input" data-uph="1" id="p_ft"></div>
+                    <div class="input-item"><label>豪洛捷收货 (条)</label><input type="number" class="data-input medicine-input" data-uph="10" id="p_hlj_sh"></div>
+                    <div class="input-item"><label>豪洛捷打标签 (个)</label><input type="number" class="data-input medicine-input" data-uph="3500" id="p_hlj_tb"></div>
+                    <div class="input-item"><label>电商分包 (套)</label><input type="number" class="data-input medicine-input" data-uph="45" id="p_ds"></div>
+                </div></div>
+             </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 style="margin-bottom:20px;">📊 各环节人力分布推荐</h3>
+            <div id="chart-area">
+                <div style="text-align:center; color:#999; padding:20px;">暂无输入数据</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pdf-container"></div>
+    
+    <div id="scheduler-modal" class="scheduler-modal">
+        <div class="scheduler-content" id="scheduler-capture-area">
+            <div class="res-pool-panel">
+                <h4 style="margin-top:0">🗂️ 人员资源池</h4>
+                <div class="add-staff-area">
+                    <textarea id="new-staff-names" placeholder="批量添加姓名 (空格隔开)"></textarea>
+                    
+                    <div style="margin-bottom:8px; display:flex; gap:10px; align-items:center;">
+                        <select id="staff-origin" style="padding:4px; border-radius:4px; border:1px solid #ccc; font-size:12px; width:80px; margin:0;">
+                            <option value="冷库">冷库</option>
+                            <option value="常温">常温</option>
+                            <option value="器械">器械</option>
+                            <option value="药品">药品</option>
+                        </select>
+                        <span style="font-size:12px; color:#7F8C8D;">支援外组将附带此来源前缀</span>
+                    </div>
+
+                    <div style="margin-bottom:5px;">
+                        <label class="type-radio"><input type="radio" name="staffType" value="3" checked>🟩一线</label>
+                        <label class="type-radio"><input type="radio" name="staffType" value="4">🟨临时</label>
+                        <label class="type-radio"><input type="radio" name="staffType" value="1">🟦管理</label>
+                        <label class="type-radio"><input type="radio" name="staffType" value="2">🟪文员</label>
+                    </div>
+                    
+                    <button class="btn" onclick="addNewStaff()" style="margin:0; padding:6px; background:#2c3e50;">➕ 批量入池</button>
+                    
+                    <div style="display:flex; gap:5px; margin-top: 10px;">
+                        <button onclick="returnAllToPool()" style="flex:1; padding:6px; font-size:12px; background:#f39c12; color:white; border:none; border-radius:4px; cursor:pointer;">↩️ 一键回池</button>
+                        <button onclick="clearResourcePool()" style="flex:1; padding:6px; font-size:12px; background:#c0392b; color:white; border:none; border-radius:4px; cursor:pointer;">🧹 清空资源池</button>
+                    </div>
+                </div>
+                
+                <div style="font-size:12px; color:#666; margin-bottom:5px;">拖拽人员到右侧排班 (点击X回池)</div>
+                <div id="pool-container" class="pool-container"></div>
+            </div>
+
+            <div class="schedule-board">
+                <div id="sched-view-roche" class="schedule-col hidden" style="display:flex; flex-direction:row; width:100%;">
+                    <div id="sched-roche-cold-col" class="schedule-col" style="border-right:2px solid #eee; padding-right:10px;">
+                        <h3 style="color:var(--roche-blue)">❄️ 冷库组排班</h3>
+                        <div class="schedule-zone zone-base-container">
+                            <div class="zone-title">🏠 本组出勤 <span id="count-roche-cold-base">0</span></div>
+                            <div id="zone_roche_cold_base" class="zone-box sortable-zone" data-target="base_roche_cold"></div>
+                        </div>
+                        <div class="schedule-zone zone-sup-container">
+                            <div class="zone-title">🟧 支援人员 <span id="count-roche-cold-sup">0</span></div>
+                            <div id="zone_roche_cold_sup" class="zone-box sortable-zone" data-target="sup_roche_cold"></div>
+                        </div>
+                        <div class="schedule-zone zone-gap-container" style="background:#fff0f0; border-color:#fadbd8">
+                            <div class="zone-title" style="color:#c0392b">🟥 人员缺口 (自动生成)</div>
+                            <div id="gap_roche_cold_area" class="zone-box" style="border:none; background:transparent;"></div>
+                        </div>
+                    </div>
+                    <div id="sched-roche-amb-col" class="schedule-col" style="padding-left:10px;">
+                        <h3 style="color:var(--roche-sand)">☀️ 常温组排班</h3>
+                        <div class="schedule-zone zone-base-container">
+                            <div class="zone-title">🏠 本组出勤 <span id="count-roche-amb-base">0</span></div>
+                            <div id="zone_roche_amb_base" class="zone-box sortable-zone" data-target="base_roche_amb"></div>
+                        </div>
+                        <div class="schedule-zone zone-sup-container">
+                            <div class="zone-title">🟧 支援人员 <span id="count-roche-amb-sup">0</span></div>
+                            <div id="zone_roche_amb_sup" class="zone-box sortable-zone" data-target="sup_roche_amb"></div>
+                        </div>
+                        <div class="schedule-zone zone-gap-container" style="background:#fff0f0; border-color:#fadbd8">
+                            <div class="zone-title" style="color:#c0392b">🟥 人员缺口 (自动生成)</div>
+                            <div id="gap_roche_amb_area" class="zone-box" style="border:none; background:transparent;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sched-view-generic" class="schedule-col hidden">
+                    <h3 id="sched-generic-title">⚙️ 项目组排班</h3>
+                    <div class="schedule-zone zone-base-container">
+                        <div class="zone-title">🏠 本组出勤 <span id="count-generic-base">0</span></div>
+                        <div id="zone_generic_base" class="zone-box sortable-zone"></div>
+                    </div>
+                    <div class="schedule-zone zone-sup-container">
+                        <div class="zone-title">🟧 支援人员 <span id="count-generic-sup">0</span></div>
+                        <div id="zone_generic_sup" class="zone-box sortable-zone"></div>
+                    </div>
+                     <div class="schedule-zone zone-gap-container" style="background:#fff0f0; border-color:#fadbd8">
+                        <div class="zone-title" style="color:#c0392b">🟥 人员缺口 (自动生成)</div>
+                        <div id="gap_generic_area" class="zone-box" style="border:none; background:transparent;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="closeScheduler()" class="scheduler-close-btn" style="position:absolute; top:10px; right:10px; width:40px; height:40px; background:#e74c3c; color:white; border:none; border-radius:50%; font-size:20px; cursor:pointer;">×</button>
+        </div>
+    </div>
+
+<script>
+    const date = new Date();
+    const dateStr = date.getFullYear() + "年" + (date.getMonth() + 1) + "月" + date.getDate() + "日";
+    document.getElementById('currentDate').innerText = dateStr;
+
+    // 默认初始项目
+    let currentProject = 'roche_cold';
+    
+    // 全局数据结构：存储所有人员
+    let staffData = {
+        pool: [], // 资源池 {id, name, type, origin}
+        roche_cold_base: [], roche_cold_sup: [],
+        roche_amb_base: [], roche_amb_sup: [],
+        device_base: [], device_sup: [],
+        medicine_base: [], medicine_sup: []
+    };
+
+    function calcStaff() {
+        const groups = ['roche_cold', 'roche_amb', 'device', 'medicine'];
+        groups.forEach(g => {
+            const base = parseInt(document.getElementById('base_' + g)?.value) || 0;
+            const abs = 0; 
+            const sup = parseInt(document.getElementById('sup_' + g)?.value) || 0;
+            const actual = Math.max(0, base - abs + sup);
+            const targetInput = document.getElementById('fc_' + g);
+            if(targetInput) targetInput.value = actual;
+        });
+    }
+
+    function switchView() {
+        const select = document.getElementById('project-select');
+        currentProject = select.value;
+        const pageTitle = document.getElementById('page-title');
+        
+        // 1. 全部隐藏重置
+        document.getElementById('view-roche').classList.add('hidden');
+        document.getElementById('view-device').classList.add('hidden');
+        document.getElementById('view-medicine').classList.add('hidden');
+        
+        document.getElementById('formal-roche').classList.add('hidden');
+        document.getElementById('formal-device').classList.add('hidden');
+        document.getElementById('formal-medicine').classList.add('hidden');
+
+        document.getElementById('dash-roche-group').classList.add('hidden');
+        document.getElementById('dash-device-group').classList.add('hidden');
+        document.getElementById('dash-medicine-group').classList.add('hidden');
+
+        document.getElementById('shift_roche_cold_div').style.display = 'none';
+        document.getElementById('shift_roche_amb_div').style.display = 'none';
+        document.getElementById('shift_device_div').style.display = 'none';
+        document.getElementById('shift_medicine_div').style.display = 'none';
+        
+        // 隐藏联合PDF按钮
+        document.getElementById('btn-combined-pdf').style.display = 'none';
+
+        // 罗诊内部视图重置（默认先全展示，后续根据冷库/常温隐藏另一半）
+        document.getElementById('formal-roche-cold-group').classList.remove('hidden');
+        document.getElementById('formal-roche-amb-group').classList.remove('hidden');
+        document.getElementById('dash-roche-cold-card').classList.remove('hidden');
+        document.getElementById('dash-roche-amb-card').classList.remove('hidden');
+        document.getElementById('view-roche-cold-col').classList.remove('hidden');
+        document.getElementById('view-roche-amb-col').classList.remove('hidden');
+
+        const originSelect = document.getElementById('staff-origin');
+
+        // 2. 根据选项显示对应视图
+        if (currentProject === 'roche_cold') {
+            document.getElementById('shift_roche_cold_div').style.display = 'flex';
+            originSelect.value = '冷库';
+
+            pageTitle.innerText = "罗诊冷库项目人力排班决策模型";
+            select.style.backgroundColor = "var(--roche-blue)";
+
+            document.getElementById('view-roche').classList.remove('hidden');
+            document.getElementById('formal-roche').classList.remove('hidden');
+            document.getElementById('dash-roche-group').classList.remove('hidden');
+            document.getElementById('dash-roche-group').style.display = 'flex'; 
+
+            // 隐藏常温模块
+            document.getElementById('formal-roche-amb-group').classList.add('hidden');
+            document.getElementById('dash-roche-amb-card').classList.add('hidden');
+            document.getElementById('view-roche-amb-col').classList.add('hidden');
+            
+            // ★ 显示联合版PDF按钮 ★
+            document.getElementById('btn-combined-pdf').style.display = 'block';
+
+        } else if (currentProject === 'roche_amb') {
+            document.getElementById('shift_roche_amb_div').style.display = 'flex';
+            originSelect.value = '常温';
+
+            pageTitle.innerText = "罗诊常温项目人力排班决策模型";
+            select.style.backgroundColor = "var(--roche-sand)";
+
+            document.getElementById('view-roche').classList.remove('hidden');
+            document.getElementById('formal-roche').classList.remove('hidden');
+            document.getElementById('dash-roche-group').classList.remove('hidden');
+            document.getElementById('dash-roche-group').style.display = 'flex'; 
+
+            // 隐藏冷库模块
+            document.getElementById('formal-roche-cold-group').classList.add('hidden');
+            document.getElementById('dash-roche-cold-card').classList.add('hidden');
+            document.getElementById('view-roche-cold-col').classList.add('hidden');
+            
+            // ★ 显示联合版PDF按钮 ★
+            document.getElementById('btn-combined-pdf').style.display = 'block';
+
+        } else if (currentProject === 'device') {
+            document.getElementById('shift_device_div').style.display = 'flex';
+            originSelect.value = '器械';
+
+            pageTitle.innerText = "器械项目人力排班决策模型";
+            select.style.backgroundColor = "var(--device-green)";
+            
+            document.getElementById('view-device').classList.remove('hidden');
+            document.getElementById('formal-device').classList.remove('hidden');
+            document.getElementById('dash-device-group').classList.remove('hidden');
+            document.getElementById('dash-device-group').style.display = 'flex';
+        } else if (currentProject === 'medicine') {
+            document.getElementById('shift_medicine_div').style.display = 'flex';
+            originSelect.value = '药品';
+
+            pageTitle.innerText = "药品项目人力排班决策模型";
+            select.style.backgroundColor = "var(--medicine-purple)";
+            
+            document.getElementById('view-medicine').classList.remove('hidden');
+            document.getElementById('formal-medicine').classList.remove('hidden');
+            document.getElementById('dash-medicine-group').classList.remove('hidden');
+            document.getElementById('dash-medicine-group').style.display = 'flex';
+        }
+        update();
+    }
+
+/* === V16.4 终极初始化引擎 (支持定向洗地与全局去重) === */
+    function init() {
+        const params = new URLSearchParams(window.location.search);
+        // 1. 先加载本地数据 (作为底座) - ★ 升级为 v5 彻底清零历史缓存 ★
+        loadStaffData();
+        
+        // 2. 尝试从链接加载排班数据 (作为补丁)
+        if (params.has('sdata')) {
+            try {
+                const compressed = params.get('sdata');
+                const jsonStr = decodeURIComponent(atob(compressed));
+                const linkData = JSON.parse(jsonStr);
+                
+                const isFullLink = linkData.pool !== undefined;
+
+                // --- 终极引擎 Step 1: 业务数据（输入框）的定向净化 ---
+                if (isFullLink) {
+                    // 收到全量链接，清空本地所有输入框
+                    document.querySelectorAll('.data-input').forEach(input => {
+                        input.value = ""; localStorage.removeItem(input.id);
+                    });
+                } else {
+                    // 收到纯净链接，智能识别发件人身份，只清空对应区域
+                    let hasCold = linkData['roche_cold_base'] || linkData['roche_cold_sup'];
+                    let hasAmb = linkData['roche_amb_base'] || linkData['roche_amb_sup'];
+                    let hasDevice = linkData['device_base'] || linkData['device_sup'];
+                    let hasMed = linkData['medicine_base'] || linkData['medicine_sup'];
+                    
+                    if (hasCold) document.querySelectorAll('#view-roche-cold-col .data-input').forEach(i => { i.value=""; localStorage.removeItem(i.id); });
+                    if (hasAmb) document.querySelectorAll('#view-roche-amb-col .data-input').forEach(i => { i.value=""; localStorage.removeItem(i.id); });
+                    if (hasDevice) document.querySelectorAll('#view-device .data-input').forEach(i => { i.value=""; localStorage.removeItem(i.id); });
+                    if (hasMed) document.querySelectorAll('#view-medicine .data-input').forEach(i => { i.value=""; localStorage.removeItem(i.id); });
+                }
+
+                // --- 终极引擎 Step 2: 排班人员的局部退场与精准空投 ---
+                if (isFullLink) {
+                    staffData = linkData; // 全量链接直接覆盖一切
+                } else {
+                    // 局部退场：把即将被覆盖的沙盘里的本地人员先妥善退回资源池
+                    for (let key in linkData) {
+                        if (key !== 'pool' && staffData[key] && Array.isArray(linkData[key])) {
+                            staffData.pool.push(...staffData[key]);
+                            staffData[key] = [];
+                        }
+                    }
+                    // 精准空投：加载链接里传来的新排班人员
+                    for (let key in linkData) {
+                        if (Array.isArray(linkData[key])) {
+                            staffData[key] = linkData[key];
+                        }
+                    }
+                }
+
+                // --- 终极引擎 Step 3: 全局洗地去重引擎 ---
+                let workingNames = new Set();
+                // 1. 扫描四大沙盘，生成“在岗白名单”
+                for (let key in staffData) {
+                    if (key !== 'pool') {
+                        staffData[key].forEach(staff => workingNames.add(staff.name));
+                    }
+                }
+
+                let uniquePool = [];
+                let poolNames = new Set();
+                // 2. 清洗资源池：猎杀分身
+                staffData.pool.forEach(staff => {
+                    // 条件：如果名字没在白名单里，且在池子里还没被收录过，才让你活下来
+                    if (!workingNames.has(staff.name) && !poolNames.has(staff.name)) {
+                        uniquePool.push(staff);
+                        poolNames.add(staff.name);
+                    }
+                });
+                staffData.pool = uniquePool;
+
+                saveStaffData();
+                console.log("✅ 终极引擎：已成功加载链接数据，并完成定向洗地与全局去重！");
+            } catch (e) {
+                console.error("链接排班数据解析失败", e);
+            }
+        }
+
+        // 3. 处理输入框的数值回填
+        document.querySelectorAll('input, select').forEach(el => {
+            if (el.id && params.has(el.id)) {
+                // 如果是链接传来的数值，优先填入并覆盖本地记忆
+                el.value = params.get(el.id);
+                localStorage.setItem(el.id, el.value);
+            } else if (el.id) {
+                // 否则读取本地记忆 (注意：因为上面已经做了定向清空，脏数据已经被清除了，读出来的只有干净的本地数据)
+                const storedVal = localStorage.getItem(el.id);
+                if (storedVal !== null) el.value = storedVal;
+            }
+        });
+        
+        if(params.has('project-select')){
+            document.getElementById('project-select').value = params.get('project-select');
+        } else {
+            // 如果没有参数，默认显示冷库
+            document.getElementById('project-select').value = 'roche_cold';
+        }
+        
+        switchView();
+    }
+
+    function update(e) {
+        calcStaff();
+        // ★ V16.0 全局自动保存 ★
+        if (e && e.target && e.target.id) {
+            localStorage.setItem(e.target.id, e.target.value);
+        } else {
+            document.querySelectorAll('input, select').forEach(el => {
+                if(el.id) localStorage.setItem(el.id, el.value);
+            });
+        }
+
+        const eff = parseFloat(document.getElementById('eff').value);
+        const oee = parseFloat(document.getElementById('oee').value);
+        
+        let shiftCold = parseFloat(document.getElementById('shift_roche_cold').value) || 8;
+        let shiftAmb = parseFloat(document.getElementById('shift_roche_amb').value) || 8;
+        let shiftDevice = parseFloat(document.getElementById('shift_device').value) || 8;
+        let shiftMedicine = parseFloat(document.getElementById('shift_medicine').value) || 8;
+
+        document.getElementById('disp_eff').innerText = eff.toFixed(2);
+        document.getElementById('disp_oee').innerText = oee.toFixed(2);
+        
+        if(currentProject === 'roche') {
+             document.getElementById('res_shift').innerText = shiftCold === shiftAmb ? shiftCold : `❄️${shiftCold} / ☀️${shiftAmb}`;
+        } else if (currentProject === 'roche_cold') {
+             document.getElementById('res_shift').innerText = shiftCold;
+        } else if (currentProject === 'roche_amb') {
+             document.getElementById('res_shift').innerText = shiftAmb;
+        } else if (currentProject === 'device') {
+             document.getElementById('res_shift').innerText = shiftDevice;
+        } else {
+             document.getElementById('res_shift').innerText = shiftMedicine;
+        }
+
+        let totalNeed = 0;
+        let chartData = [];
+        const baseProject = currentProject.split('_')[0];
+
+        if (currentProject.startsWith('roche')) {
+            const capCold = shiftCold * oee * eff;
+            const capAmb = shiftAmb * oee * eff;   
+
+            const fcCold = parseInt(document.getElementById('fc_roche_cold').value) || 0;
+            const fcAmb = parseInt(document.getElementById('fc_roche_amb').value) || 0;
+            let hoursCold = 0, hoursAmb = 0;
+
+            document.querySelectorAll('#view-roche .data-input').forEach(input => {
+                // 跳过被隐藏的列，防止数据串线
+                if (input.closest('.col').classList.contains('hidden')) return;
+
+                const val = parseInt(input.value) || 0;
+                if(val > 0) {
+                    const uph = parseFloat(input.dataset.uph);
+                    const hours = val / uph;
+                    const isAmb = input.dataset.subtype === 'amb';
+                    const label = input.previousElementSibling.innerText;
+                    const groupTitle = input.closest('.card').querySelector('h4').innerText.split(' ')[1] || "";
+                    const fullName = groupTitle ? `${groupTitle}-${label}` : label;
+
+                    if(isAmb) hoursAmb += hours; else hoursCold += hours;
+                    
+                    chartData.push({ 
+                        name: fullName, 
+                        hours: hours, 
+                        people: hours / (isAmb ? capAmb : capCold), 
+                        color: isAmb ? 'var(--roche-sand)' : 'var(--roche-blue)' 
+                    });
+                }
+            });
+            const gapCold = Math.max(0, (hoursCold / oee) - (fcCold * shiftCold));
+            const gapAmb = Math.max(0, (hoursAmb / oee) - (fcAmb * shiftAmb));
+            
+            const needCold = Math.ceil(gapCold / capCold);
+            const needAmb = Math.ceil(gapAmb / capAmb);
+
+            document.getElementById('res_roche_cold').innerText = needCold + " 人";
+            document.getElementById('gap_roche_cold').innerText = gapCold.toFixed(1);
+            document.getElementById('res_roche_amb').innerText = needAmb + " 人";
+            document.getElementById('gap_roche_amb').innerText = gapAmb.toFixed(1);
+            
+            if (currentProject === 'roche') {
+                totalNeed = needCold + needAmb; // 用于联合生成
+            } else if (currentProject === 'roche_cold') {
+                totalNeed = needCold;
+            } else {
+                totalNeed = needAmb;
+            }
+            
+        } else if (currentProject === 'device') {
+            const capGen = shiftDevice * oee * eff;
+            const fc = parseInt(document.getElementById('fc_device').value) || 0;
+            let totalHours = 0;
+            document.querySelectorAll('#view-device .data-input').forEach(input => {
+                const val = parseInt(input.value) || 0;
+                if(val > 0) {
+                    const uph = parseFloat(input.dataset.uph);
+                    const hours = val / uph;
+                    const label = input.previousElementSibling.innerText;
+                    const groupTitle = input.closest('.card').querySelector('h4').innerText.split(' ')[1] || "";
+                    const fullName = `${groupTitle}-${label}`;
+                    totalHours += hours;
+                    chartData.push({ name: fullName, hours: hours, people: hours / capGen, color: 'var(--device-green)' });
+                }
+            });
+            const gap = Math.max(0, (totalHours / oee) - (fc * shiftDevice)); 
+            const need = Math.ceil(gap / capGen);
+            document.getElementById('res_device').innerText = need + " 人";
+            document.getElementById('gap_device').innerText = gap.toFixed(1);
+            totalNeed = need;
+        } else if (currentProject === 'medicine') {
+            const capGen = shiftMedicine * oee * eff;
+            const fc = parseInt(document.getElementById('fc_medicine').value) || 0;
+            let totalHours = 0;
+            document.querySelectorAll('#view-medicine .data-input').forEach(input => {
+                const val = parseInt(input.value) || 0;
+                if(val > 0) {
+                    const uph = parseFloat(input.dataset.uph);
+                    const hours = val / uph;
+                    const label = input.previousElementSibling.innerText;
+                    const groupTitle = input.closest('.card').querySelector('h4').innerText.split(' ')[1] || "";
+                    const fullName = `${groupTitle}-${label}`;
+                    totalHours += hours;
+                    chartData.push({ name: fullName, hours: hours, people: hours / capGen, color: 'var(--medicine-purple)' });
+                }
+            });
+            const gap = Math.max(0, (totalHours / oee) - (fc * shiftMedicine)); 
+            const need = Math.ceil(gap / capGen);
+            document.getElementById('res_medicine').innerText = need + " 人";
+            document.getElementById('gap_medicine').innerText = gap.toFixed(1);
+            totalNeed = need;
+        }
+
+        document.getElementById('res_total').innerText = totalNeed + " 人";
+        renderChart(chartData);
+        syncGapBlocks();
+    }
+
+    function renderChart(data) {
+        const container = document.getElementById('chart-area');
+        container.innerHTML = "";
+        if (data.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">暂无输入数据</div>';
+            return;
+        }
+        data.sort((a, b) => b.hours - a.hours);
+        const maxHours = data[0].hours;
+        data.forEach(item => {
+            const widthPct = (item.hours / maxHours) * 100;
+            const peopleNum = item.people < 0.1 ? "<0.1" : item.people.toFixed(1);
+            const row = document.createElement('div');
+            row.className = 'chart-row';
+            row.innerHTML = `<div class="chart-label" title="${item.name}">${item.name}</div>
+                <div class="chart-bar-area"><div class="chart-bar" style="width: ${widthPct}%; background-color: ${item.color}">${item.hours.toFixed(1)} 小时</div></div>
+                <div class="chart-val">推荐: ${peopleNum}人</div>`;
+            container.appendChild(row);
+        });
+    }
+
+    /* === V16.5 仅清空业务量 (不再退回排班人员) === */
+    function clearData(isFull = false) {
+        const msg = isFull 
+            ? "确定要清空【所有组】的业务量数据吗？\n\n（注意：排班沙盘里的人员将保持原封不动）" 
+            : "确定要清空【当前组】的业务量数据吗？\n\n（注意：排班沙盘里的人员将保持原封不动）";
+            
+        if(confirm(msg)) {
+            if (isFull) {
+                // 清空全部业务数据
+                document.querySelectorAll('.data-input').forEach(input => {
+                    input.value = ""; 
+                    if(input.id) localStorage.removeItem(input.id); 
+                });
+            } else {
+                // 仅清空当前激活视窗内的业务数据
+                const baseProject = currentProject.split('_')[0];
+                const activeViewId = baseProject === 'roche' ? 'view-roche' : `view-${baseProject}`;
+                document.querySelectorAll(`#${activeViewId} .data-input`).forEach(input => {
+                    if (!input.closest('.col').classList.contains('hidden')) {
+                        input.value = ""; 
+                        if(input.id) localStorage.removeItem(input.id); 
+                    }
+                });
+            }
+            update(); 
+        }
+    }
+
+    /* === V16.5 沙盘专属：一键回池 === */
+    function returnAllToPool() {
+        if(confirm("确定要将【所有组】的在岗排班人员，全部退回左侧资源池吗？")) {
+            const zones = ['roche_cold_base', 'roche_cold_sup', 'roche_amb_base', 'roche_amb_sup', 'device_base', 'device_sup', 'medicine_base', 'medicine_sup'];
+            zones.forEach(zone => {
+                if (staffData[zone] && staffData[zone].length > 0) {
+                    staffData.pool.push(...staffData[zone]);
+                    staffData[zone] = []; 
+                }
+            });
+            saveStaffData();
+            renderScheduler();
+        }
+    }
+
+    /* === V16.5 沙盘专属：一键清空资源池 === */
+    function clearResourcePool() {
+        if(confirm("确定要【彻底删除】左侧资源池里的所有人吗？\n\n（提示：右侧已经安排在岗的人员不受影响）")) {
+            staffData.pool = [];
+            saveStaffData();
+            renderScheduler();
+        }
+    }
+
+    /* === 排班沙盘核心逻辑 === */
+    function openScheduler() {
+        document.getElementById('scheduler-modal').style.display = 'flex';
+        loadStaffData();
+        renderScheduler();
+        syncGapBlocks();
+    }
+
+    function closeScheduler() {
+        document.getElementById('scheduler-modal').style.display = 'none';
+        saveStaffData();
+    }
+
+    function loadStaffData() {
+        // ★ 注意：升级为 v5 可以直接废弃并清空用户之前存的历史缓存数据 ★
+        const stored = localStorage.getItem('staffData_v5');
+        if (stored) {
+            try { staffData = JSON.parse(stored);
+            } catch(e) { console.error(e); }
+        }
+        initSortable();
+    }
+
+    function saveStaffData() {
+        localStorage.setItem('staffData_v5', JSON.stringify(staffData));
+        updateMainInputsFromScheduler();
+    }
+
+    function updateMainInputsFromScheduler() {
+        const map = {
+            'roche_cold_base': 'base_roche_cold', 'roche_cold_sup': 'sup_roche_cold',
+            'roche_amb_base': 'base_roche_amb', 'roche_amb_sup': 'sup_roche_amb',
+            'device_base': 'base_device', 'device_sup': 'sup_device',
+            'medicine_base': 'base_medicine', 'medicine_sup': 'sup_medicine'
+        };
+        for (let key in map) {
+            const count = staffData[key] ? staffData[key].length : 0;
+            const inputId = map[key];
+            const el = document.getElementById(inputId);
+            if (el) {
+                el.value = count;
+                el.classList.add('input-readonly');
+                el.readOnly = true;
+                const spanId = 'count-' + key.replace(/_/g, '-');
+                const countSpan = document.getElementById(spanId);
+                if(countSpan) countSpan.innerText = count;
+            }
+        }
+        update(); 
+        syncGapBlocks();
+    }
+
+    function renderScheduler() {
+        document.getElementById('sched-view-roche').classList.add('hidden');
+        document.getElementById('sched-view-generic').classList.add('hidden');
+        
+        // 恢复罗诊内部两列的显示
+        document.getElementById('sched-roche-cold-col').style.display = 'flex';
+        document.getElementById('sched-roche-amb-col').style.display = 'flex';
+
+        if (currentProject.startsWith('roche')) {
+            document.getElementById('sched-view-roche').classList.remove('hidden');
+            document.getElementById('sched-view-roche').style.display = 'flex';
+            
+            // 根据冷库/常温隐藏不需要的那一半沙盘
+            if (currentProject === 'roche_cold') {
+                document.getElementById('sched-roche-amb-col').style.display = 'none';
+            } else if (currentProject === 'roche_amb') {
+                document.getElementById('sched-roche-cold-col').style.display = 'none';
+            }
+
+        } else {
+            document.getElementById('sched-view-generic').classList.remove('hidden');
+            const title = currentProject === 'device' ? '⚙️ 器械组排班' : '🌿 药品组排班';
+            document.getElementById('sched-generic-title').innerText = title;
+            document.getElementById('zone_generic_base').id = `zone_${currentProject}_base`;
+            document.getElementById('zone_generic_sup').id = `zone_${currentProject}_sup`;
+            document.getElementById('count-generic-base').id = `count-${currentProject}-base`;
+            document.getElementById('count-generic-sup').id = `count-${currentProject}-sup`;
+        }
+
+        const poolEl = document.getElementById('pool-container');
+        poolEl.innerHTML = '';
+        staffData.pool.forEach((staff, idx) => {
+            poolEl.appendChild(createStaffEl(staff, 'pool', idx));
+        });
+        const zones = ['roche_cold_base', 'roche_cold_sup', 'roche_amb_base', 'roche_amb_sup', 'device_base', 'device_sup', 'medicine_base', 'medicine_sup'];
+        zones.forEach(zoneKey => {
+            const el = document.getElementById('zone_' + zoneKey);
+            if(el) {
+                el.innerHTML = '';
+                if(staffData[zoneKey]) {
+                    staffData[zoneKey].forEach((staff, idx) => {
+                        el.appendChild(createStaffEl(staff, zoneKey, idx));
+                    });
+                }
+            }
+        });
+        updateMainInputsFromScheduler();
+    }
+
+    function createStaffEl(staff, sourceKey, idx) {
+        const div = document.createElement('div');
+        div.className = `staff-card staff-type-${staff.type}`;
+        
+        // 解析当前全局项目环境归属哪个组
+        let currentOrigin = '';
+        if (currentProject === 'roche_cold' || currentProject === 'roche') currentOrigin = '冷库';
+        else if (currentProject === 'roche_amb') currentOrigin = '常温';
+        else if (currentProject === 'device') currentOrigin = '器械';
+        else if (currentProject === 'medicine') currentOrigin = '药品';
+
+        // 解析这个名片目前所处的容器归属哪个组
+        let zoneOrigin = currentOrigin;
+        if (sourceKey.includes('roche_cold')) zoneOrigin = '冷库';
+        else if (sourceKey.includes('roche_amb')) zoneOrigin = '常温';
+        else if (sourceKey.includes('device')) zoneOrigin = '器械';
+        else if (sourceKey.includes('medicine')) zoneOrigin = '药品';
+
+        let displayName = staff.name;
+        
+        // 如果该人员有跨组属性，并且不属于当前所在的组，带上来源名片标识
+        if (staff.origin && staff.origin !== zoneOrigin) {
+            displayName = `(${staff.origin})${staff.name}`;
+        }
+
+        div.innerHTML = `${displayName} <span class="staff-delete" onclick="removeStaff('${sourceKey}', ${idx})">×</span>`;
+        div.dataset.id = staff.id; 
+        return div;
+    }
+
+    // ★ 智能防重名拦截 ★
+    function addNewStaff() {
+        const input = document.getElementById('new-staff-names');
+        const names = input.value.trim();
+        if(!names) return;
+        const type = document.querySelector('input[name="staffType"]:checked').value;
+        const originVal = document.getElementById('staff-origin').value;
+
+        const nameArr = names.split(/[\s,，]+/);
+        let duplicates = []; 
+        let addedCount = 0;  
+
+        nameArr.forEach(n => {
+            if(n) {
+                // 全局查重
+                let isExist = false;
+                for (let key in staffData) {
+                    if (staffData[key].some(staff => staff.name === n)) {
+                        isExist = true;
+                        break;
+                    }
+                }
+
+                if (isExist) {
+                    duplicates.push(n);
+                } else {
+                    staffData.pool.push({
+                        id: Date.now() + Math.random(),
+                        name: n,
+                        type: type,
+                        origin: originVal
+                    });
+                    addedCount++;
+                }
+            }
+        });
+
+        if (duplicates.length > 0) {
+            alert(`以下人员已在资源池或排班中，为防重复已自动过滤：\n【 ${duplicates.join('， ')} 】`);
+        }
+
+        if (addedCount > 0 || duplicates.length > 0) {
+            input.value = '';
+            saveStaffData();
+            renderScheduler();
+        }
+    }
+
+    function removeStaff(sourceKey, idx) {
+        const staff = staffData[sourceKey].splice(idx, 1)[0];
+        if (sourceKey !== 'pool') staffData.pool.push(staff);
+        saveStaffData();
+        renderScheduler();
+    }
+
+    function syncGapBlocks() {
+        const map = {
+            'gap_roche_cold_area': 'res_roche_cold',
+            'gap_roche_amb_area': 'res_roche_amb',
+            'gap_generic_area': currentProject === 'device' ? 'res_device' : 'res_medicine'
+        };
+        ['gap_roche_cold_area', 'gap_roche_amb_area', 'gap_generic_area'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.innerHTML = '';
+        });
+        for (let areaId in map) {
+            // 如果不是罗诊，且区域ID包含roche，跳过
+            if (!currentProject.startsWith('roche') && areaId.includes('roche')) continue;
+            // 如果是罗诊，且区域ID是通用的，跳过
+            if (currentProject.startsWith('roche') && areaId === 'gap_generic_area') continue;
+
+            const targetId = map[areaId];
+            const needText = document.getElementById(targetId)?.innerText || "0";
+            const needCount = parseInt(needText) || 0; 
+            
+            const container = document.getElementById(areaId);
+            if (container) {
+                if (needCount > 0) {
+                    for(let i=0; i<needCount; i++) {
+                        const block = document.createElement('div');
+                        block.className = 'gap-block';
+                        block.innerText = `缺口${i+1}`;
+                        container.appendChild(block);
+                    }
+                } else {
+                    container.innerHTML = '<div style="font-size:12px; color:#27ae60; padding:5px; font-weight:bold;">✨ 人员充足 (已满足需求)</div>';
+                }
+            }
+        }
+    }
+
+    function initSortable() {
+        const containers = document.querySelectorAll('.pool-container, .sortable-zone');
+        containers.forEach(el => {
+            if(el._sortable) el._sortable.destroy();
+            el._sortable = new Sortable(el, {
+                group: 'staff',
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                onEnd: function (evt) {
+                    const itemEl = evt.item;
+                    const fromKey = evt.from.id === 'pool-container' ? 'pool' : evt.from.id.replace('zone_', '');
+                    const toKey = evt.to.id === 'pool-container' ? 'pool' : evt.to.id.replace('zone_', '');
+                
+                    if (fromKey === toKey && evt.newIndex === evt.oldIndex) return;
+                    const movedItem = staffData[fromKey].splice(evt.oldIndex, 1)[0];
+                    staffData[toKey].splice(evt.newIndex, 0, movedItem);
+                    saveStaffData();
+                }
+            });
+        });
+    }
+
+    /* === V16.2 联合版 PDF 魔法实现 === */
+    async function generateCombinedPDF() {
+        // 瞬间：展示出冷库和常温所有的内容，合体成完整版罗诊
+        document.getElementById('formal-roche-cold-group').classList.remove('hidden');
+        document.getElementById('dash-roche-cold-card').classList.remove('hidden');
+        document.getElementById('view-roche-cold-col').classList.remove('hidden');
+        document.getElementById('sched-roche-cold-col').style.display = 'flex';
+
+        document.getElementById('formal-roche-amb-group').classList.remove('hidden');
+        document.getElementById('dash-roche-amb-card').classList.remove('hidden');
+        document.getElementById('view-roche-amb-col').classList.remove('hidden');
+        document.getElementById('sched-roche-amb-col').style.display = 'flex';
+        
+        // 瞬间：修改系统状态，让其认为当前是 "roche"
+        const tempProject = currentProject;
+        currentProject = 'roche'; 
+        document.getElementById('page-title').innerText = "罗诊项目人力排班决策模型";
+        
+        // 强制重新算一次，让柱状图包含两边的数据
+        update(); 
+
+        // 执行原有的截屏和生成 PDF 逻辑（传入一个标志位，告诉它这是联合生成的）
+        await generatePDF(true);
+
+        // 瞬间：恢复现场
+        currentProject = tempProject;
+        switchView(); // 重新按当前模式隐藏另一半
+        update(); // 重新计算柱状图回原始状态
+    }
+
+    /* === V15.3 PDF生成 === */
+    async function generatePDF(isCombined = false) {
+        const { jsPDF } = window.jspdf;
+        const pdfContainer = document.getElementById('pdf-container');
+        const msgEl = document.getElementById('pdf-msg');
+        if(msgEl) msgEl.style.display = 'block';
+
+        // 确定真正用于生成的项目标识 (处理联合生成的情况)
+        let effectiveProject = currentProject;
+        if (isCombined) effectiveProject = 'roche';
+
+        // 【★ 核心修复：单独生成PDF时，强制隐藏另一个组的排班沙盘列 ★】
+        if (effectiveProject === 'roche_cold') {
+            document.getElementById('sched-roche-cold-col').style.display = 'flex';
+            document.getElementById('sched-roche-amb-col').style.display = 'none';
+        } else if (effectiveProject === 'roche_amb') {
+            document.getElementById('sched-roche-cold-col').style.display = 'none';
+            document.getElementById('sched-roche-amb-col').style.display = 'flex';
+        } else if (effectiveProject === 'roche') {
+            document.getElementById('sched-roche-cold-col').style.display = 'flex';
+            document.getElementById('sched-roche-amb-col').style.display = 'flex';
+        }
+
+        // --- 1. 截图沙盘 ---
+        let schedulerImgData = null;
+        let schedulerRatio = 0;
+        const modal = document.getElementById('scheduler-modal');
+        const schedulerContent = document.getElementById('scheduler-capture-area');
+        
+        const wasVisible = modal.style.display === 'flex';
+        const originalStyle = schedulerContent.style.cssText;
+        modal.style.display = 'flex';
+        
+        // 克隆并应用宽屏样式
+        schedulerContent.classList.add('pdf-mode-active'); 
+        schedulerContent.style.width = '1350px'; 
+        schedulerContent.style.height = 'auto';
+        schedulerContent.style.position = 'fixed'; 
+        schedulerContent.style.top = '-9999px';
+        schedulerContent.style.left = '0';
+        document.body.appendChild(schedulerContent);
+        
+        // 插入报表头
+        let titleName = document.getElementById('project-select').selectedOptions[0].text;
+        if (isCombined) titleName = "💊 罗诊 (冷库+常温联合版)";
+
+        const headerDiv = document.createElement('div');
+        headerDiv.innerHTML = `
+            <div style="padding: 40px 40px 10px 40px; background: #fff; text-align: center;">
+                <div style="font-size: 32px; font-weight: bold; color: #2C3E50; margin-bottom: 15px;">人员排班详细沙盘</div>
+                <div style="font-size: 16px; color: #7F8C8D; border-bottom: 2px solid #BDC3C7; padding-bottom: 20px; display: flex; justify-content: center; gap: 40px;">
+                    <span>📅 执行日期: ${dateStr}</span>
+                    <span>🏭 所属项目: ${titleName}</span>
+                </div>
+            </div>
+            <div style="padding: 10px 40px 30px 40px; background: #fff; color: #555; font-size: 14px; display: flex; justify-content: center; gap: 30px; align-items: center;">
+                <strong style="font-size:16px;">图例：</strong> 
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#3498db; margin-right:6px; border-radius:3px;"></span> 管理</span>
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#9b59b6; margin-right:6px; border-radius:3px;"></span> 文员</span>
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#27ae60; margin-right:6px; border-radius:3px;"></span> 一线员工</span>
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#f1c40f; margin-right:6px; border-radius:3px;"></span> 临时工</span>
+                <span style="display:flex; align-items:center; margin-left:10px;"><span style="width:16px; height:16px; background:#e74c3c; margin-right:6px; border-radius:3px;"></span> 缺口</span>
+            </div>
+        `;
+        schedulerContent.insertBefore(headerDiv, schedulerContent.firstChild);
+
+        try {
+            await new Promise(r => setTimeout(r, 300)); 
+            
+            const canvas2 = await html2canvas(schedulerContent, { 
+                scale: 1.5, 
+                useCORS: true, 
+                backgroundColor: '#ffffff',
+                windowWidth: 1650,
+                height: schedulerContent.scrollHeight
+            });
+        
+            schedulerImgData = canvas2.toDataURL('image/png');
+            schedulerRatio = canvas2.height / canvas2.width;
+        } catch(e) { console.error("截图失败:", e); } 
+        finally { 
+            schedulerContent.classList.remove('pdf-mode-active'); 
+            if(headerDiv.parentNode) headerDiv.parentNode.removeChild(headerDiv);
+            document.getElementById('scheduler-modal').appendChild(schedulerContent); 
+            schedulerContent.style.cssText = originalStyle;
+            schedulerContent.style.position = '';
+            schedulerContent.style.top = '';
+            schedulerContent.style.left = '';
+            if(!wasVisible) modal.style.display = 'none';
+        }
+
+        // --- 2. 构建第一页 ---
+        const colorMap = {
+            'roche': ['#2C3E50', '#c0392b', '#2980b9'], 
+            'roche_cold': ['#2C3E50', '#c0392b', '#77929F'], 
+            'roche_amb': ['#5D5046', '#c0392b', '#D4C4B7'], 
+            'device': ['#556B2F', '#c0392b', '#9CAF88'], 
+            'medicine': ['#555', '#c0392b', '#95A5A6']
+        };
+        const theme = colorMap[effectiveProject] || colorMap['roche'];
+        const getTxt = (id) => document.getElementById(id)?.innerText || '0';
+        const getVal = (id) => document.getElementById(id)?.value || '0';
+        let html = `
+            <div class="pdf-header">
+                <div class="pdf-title" style="color:${theme[0]}">${getTxt('page-title')} - 日报</div>
+                <div class="pdf-date">${dateStr}</div>
+            </div>
+            <div class="pdf-decision-row">
+        `;
+        if (effectiveProject === 'roche') {
+            html += `<div class="pdf-kpi-card" style="background:var(--roche-blue)"><div class="pdf-kpi-title">❄️ 冷库需求</div><div class="pdf-kpi-val">${getTxt('res_roche_cold')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_roche_cold')} 小时</div></div>`;
+            html += `<div class="pdf-kpi-card" style="background:var(--roche-sand)"><div class="pdf-kpi-title">☀️ 常温需求</div><div class="pdf-kpi-val">${getTxt('res_roche_amb')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_roche_amb')} 小时</div></div>`;
+        } else if (effectiveProject === 'roche_cold') {
+            html += `<div class="pdf-kpi-card" style="background:var(--roche-blue)"><div class="pdf-kpi-title">❄️ 冷库需求</div><div class="pdf-kpi-val">${getTxt('res_roche_cold')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_roche_cold')} 小时</div></div>`;
+        } else if (effectiveProject === 'roche_amb') {
+            html += `<div class="pdf-kpi-card" style="background:var(--roche-sand)"><div class="pdf-kpi-title">☀️ 常温需求</div><div class="pdf-kpi-val">${getTxt('res_roche_amb')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_roche_amb')} 小时</div></div>`;
+        } else if (effectiveProject === 'device') {
+            html += `<div class="pdf-kpi-card" style="background:var(--device-green)"><div class="pdf-kpi-title">⚙️ 器械需求</div><div class="pdf-kpi-val">${getTxt('res_device')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_device')} 小时</div></div>`;
+        } else {
+            html += `<div class="pdf-kpi-card" style="background:var(--medicine-purple)"><div class="pdf-kpi-title">🌿 药品需求</div><div class="pdf-kpi-val">${getTxt('res_medicine')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_medicine')} 小时</div></div>`;
+        }
+        html += `<div class="pdf-kpi-card" style="background:#e74c3c"><div class="pdf-kpi-title">🏆 今日总需求</div><div class="pdf-kpi-val">${getTxt('res_total')}</div><div class="pdf-kpi-sub">班次时长: ${getTxt('res_shift')} 小时</div></div></div>`;
+        
+        let staffInfo = "";
+        if(effectiveProject === 'roche') {
+            staffInfo = `❄️冷库(在${getVal('base_roche_cold')}/实${getVal('fc_roche_cold')})  ☀️常温(在${getVal('base_roche_amb')}/实${getVal('fc_roche_amb')})`;
+        } else if (effectiveProject === 'roche_cold') {
+            staffInfo = `❄️冷库(在${getVal('base_roche_cold')}/实${getVal('fc_roche_cold')})`;
+        } else if (effectiveProject === 'roche_amb') {
+            staffInfo = `☀️常温(在${getVal('base_roche_amb')}/实${getVal('fc_roche_amb')})`;
+        } else if (effectiveProject === 'device') {
+            staffInfo = `⚙️器械(在${getVal('base_device')}/实${getVal('fc_device')})`;
+        } else {
+            staffInfo = `🌿药品(在${getVal('base_medicine')}/实${getVal('fc_medicine')})`;
+        }
+        
+        html += `<div class="pdf-resource-bar"><div class="pdf-res-item">基础参数: <strong>效率系数 ${getVal('eff')} / 有效作业率 ${getVal('oee')}</strong></div><div class="pdf-res-item">正式工现状: <strong>${staffInfo}</strong></div></div><div class="pdf-details-grid">`;
+        
+        const baseViewId = effectiveProject === 'roche' ? 'view-roche' : `view-${effectiveProject.split('_')[0]}`;
+        const activeView = document.getElementById(baseViewId);
+        const cols = activeView.querySelectorAll('.col');
+        
+        cols.forEach(col => {
+            // ★跳过被隐藏的列，确保独立PDF不带另一半的数据★
+            if(col.classList.contains('hidden')) return;
+
+            html += `<div class="pdf-grid-col">`;
+            const sectionTitle = col.querySelector('div[style*="font-weight:bold"]').innerText;
+            html += `<div class="pdf-col-title">${sectionTitle}</div>`;
+            col.querySelectorAll('.card').forEach(card => {
+                const groupName = card.querySelector('h4').innerText;
+                let groupHtml = `<div class="pdf-task-group"><div class="pdf-group-name">${groupName}</div>`;
+                let hasItem = false;
+                card.querySelectorAll('.data-input').forEach(input => {
+                    if(parseInt(input.value) > 0) {
+                        hasItem = true;
+                        groupHtml += `<div class="pdf-task-item"><span class="pdf-task-name">${input.previousElementSibling.innerText}</span><span>${input.value}</span></div>`;
+                    }
+                });
+                groupHtml += `</div>`;
+                if(hasItem) html += groupHtml;
+            });
+            html += `</div>`;
+        });
+        html += `</div><div class="pdf-chart-section"><div class="pdf-chart-title">📈 人力分布推荐 (人)</div>${document.getElementById('chart-area').innerHTML}</div>`;
+        pdfContainer.innerHTML = html;
+        
+        try {
+            const canvas1 = await html2canvas(pdfContainer, { scale: 2 });
+            const imgData1 = canvas1.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pageWidth = 210;
+            pdf.addImage(imgData1, 'PNG', 0, 0, pageWidth, canvas1.height * pageWidth / canvas1.width);
+            
+            if (schedulerImgData) {
+                pdf.addPage();
+                const contentWidth = 190;
+                const contentHeight = schedulerRatio * contentWidth;
+                pdf.addImage(schedulerImgData, 'PNG', 10, 10, contentWidth, contentHeight);
+            }
+            
+            const nameMap = {'roche': '罗诊_常温冷库联合版', 'roche_cold': '罗诊冷库', 'roche_amb': '罗诊常温', 'device': '器械', 'medicine': '药品'};
+            let saveName = isCombined ? "罗诊_常温冷库联合版" : nameMap[effectiveProject];
+            pdf.save(`${saveName}_人力日报_${dateStr}.pdf`);
+            
+        } catch (e) {
+            console.error(e);
+            alert("PDF 生成遇到错误，请重试。");
+        } finally {
+            if(msgEl) msgEl.style.display = 'none';
+            pdfContainer.innerHTML = ''; 
+        }
+    }
+
+/* === V16.3 生成带排班数据的链接 (支持全量/纯净双模式) === */
+    function generateLink(isFull = false) {
+        const params = new URLSearchParams();
+        
+        // 1. 保存业务数据 (数字)
+        document.querySelectorAll('input, select').forEach(el => {
+            if (el.value != 0 && el.id) {
+                // 【核心魔法】：如果不是全量模式，且该输入框在当前页面是隐藏的，则直接跳过不收集！
+                if (!isFull && el.offsetParent === null) return; 
+                
+                params.set(el.id, el.value);
+            }
+        });
+
+        // 2. 保存人员排班数据 (JSON -> 压缩编码)
+        try {
+            let dataToCompress = {};
+            
+            if (isFull) {
+                // 全量模式：打包所有数据（包含所有组和资源池）
+                dataToCompress = staffData;
+            } else {
+                // 纯净模式：只打包当前界面的排班人员，绝不触碰资源池和其他组
+                let zonesToInclude = [];
+                if (currentProject === 'roche_cold') zonesToInclude = ['roche_cold_base', 'roche_cold_sup'];
+                else if (currentProject === 'roche_amb') zonesToInclude = ['roche_amb_base', 'roche_amb_sup'];
+                else if (currentProject === 'device') zonesToInclude = ['device_base', 'device_sup'];
+                else if (currentProject === 'medicine') zonesToInclude = ['medicine_base', 'medicine_sup'];
+
+                zonesToInclude.forEach(zone => {
+                    dataToCompress[zone] = staffData[zone];
+                });
+            }
+
+            const jsonStr = JSON.stringify(dataToCompress);
+            const compressed = btoa(encodeURIComponent(jsonStr));
+            params.set('sdata', compressed);
+        } catch (e) {
+            console.error("排班数据编码失败", e);
+        }
+
+        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?" + params.toString();
+        
+        navigator.clipboard.writeText(newUrl).then(() => {
+            // 动态提示文案
+            const msgStr = isFull ? "✅ 全量链接已复制 (包含所有历史数据)" : "✨ 纯净链接已复制 (只含当前组，不覆盖他人)";
+            document.getElementById('link-msg').innerText = msgStr;
+            document.getElementById('link-msg').style.display = 'block';
+            setTimeout(() => { document.getElementById('link-msg').style.display = 'none'; }, 3000);
+        }).catch(err => {
+            alert("复制失败，可能是链接太长了");
+        });
+    }
+
+    document.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', update);
+    });
+    window.onload = init;
+</script>
+
+</body>
+</html>
