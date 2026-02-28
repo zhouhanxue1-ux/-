@@ -79,6 +79,7 @@
             font-size: 13px;
         }
         
+        /* 只读输入框样式 */
         .input-readonly { background-color: #e9ecef; color: #555; font-weight: bold; border: 1px solid #ced4da; cursor: not-allowed; }
 
         .staff-calc-group { background-color: #f9f9f9; padding: 12px; border-radius: 6px; border: 1px solid #eee; margin-bottom: 15px; }
@@ -115,6 +116,7 @@
 
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         
+        /* 底部图表 */
         .chart-container { background: white; padding: 25px; border-radius: 8px; margin-top: 20px; border: 1px solid var(--border-color); }
         .chart-row { display: flex; align-items: center; margin-bottom: 10px; font-size: 13px; }
         .chart-label { width: 200px; text-align: right; padding-right: 15px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
@@ -128,9 +130,11 @@
         .btn:hover { background-color: #4a5a6a; transform: translateY(-1px); }
         .btn-link { margin-top: 10px; font-size: 12px; padding: 8px; color: white; border-radius: 4px; cursor: pointer; border: none; font-weight: bold; }
         
+        /* 清除按钮样式 */
         .btn-clear { background-color: white; color: #c0392b; border: 1px solid #e74c3c; margin-bottom: 10px; }
         .btn-clear:hover { background-color: #fcebe9; transform: translateY(-1px); }
 
+        /* PDF 隐藏域 */
         #pdf-container { position: fixed; left: -9999px; top: 0; width: 900px; background: white; padding: 40px; box-sizing: border-box; font-family: "Microsoft YaHei", sans-serif; color: #333; }
         .pdf-header { border-bottom: 4px solid #5C6E7D; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
         .pdf-title { font-size: 26px; font-weight: bold; color: #2C3E50; }
@@ -151,6 +155,7 @@
         .pdf-chart-section { margin-top: 20px; border-top: 2px solid #eee; padding-top: 15px; }
         .pdf-chart-title { font-size: 14px; font-weight: bold; color: #7F8C8D; margin-bottom: 10px; }
 
+        /* === 排班沙盘样式 (V14.1 滚动条优化版) === */
         .scheduler-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .scheduler-content { width: 95%; height: 90%; background: #fdfcfb; border-radius: 12px; display: flex; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; border: 4px solid white; }
         .res-pool-panel { width: 280px; background: #eaeded; padding: 15px; display: flex; flex-direction: column; border-right: 2px solid #ccc; flex-shrink: 0; }
@@ -167,17 +172,19 @@
             flex-direction: column;
         }
         
+        /* 内部放小人的盒子：基础样式 (V15.4 修复版) */
         .zone-box { 
             background: transparent;
-            border: none !important; 
+            border: none !important; /* ★ 修复：去掉内边框 */
             display: flex;
             flex-wrap: wrap; 
             gap: 8px; 
             align-content: flex-start; 
-            width: 100% !important;  
+            width: 100% !important;  /* ★ 修复：强制撑开 */
             padding-right: 5px;
         }
         
+        /* 本组出勤 (淡紫色 + 大空间 + 滚动条) */
         .zone-base-container .schedule-zone { 
             background: #f3e5f5;
             border-color: #ce93d8; flex: 2; 
@@ -187,6 +194,7 @@
             max-height: 450px; overflow-y: auto;
         }
 
+        /* 支援人员 (淡橙色 + 较小空间) */
         .zone-sup-container .schedule-zone { 
             background: #fff3e0;
             border-color: #ffcc80; flex: 1; 
@@ -196,6 +204,7 @@
             max-height: 150px; overflow-y: auto;
         }
 
+        /* 缺口区域 */
         .zone-gap-container .schedule-zone {
             background: #fff0f0;
             border-color: #fadbd8; flex: 0 0 auto;
@@ -208,6 +217,7 @@
         .zone-box::-webkit-scrollbar { width: 6px; }
         .zone-box::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 3px; }
         
+        /* 人员卡片 */
         .staff-card { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; cursor: grab; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); user-select: none; position: relative; height: 24px; }
         .staff-card:active { cursor: grabbing; transform: scale(1.05); }
         .staff-type-1 { background: #3498db; }
@@ -222,6 +232,7 @@
         .add-staff-area textarea { width: 100%; height: 60px; margin-bottom: 5px; font-size: 12px; padding: 5px; border-radius: 4px; border:1px solid #ccc; }
         .type-radio { font-size: 12px; margin-right: 8px; cursor: pointer; }
 
+        /* === V15.3 终极 PDF 报表样式 (宽屏截图适配) === */
         .pdf-mode-active {
             display: block !important;
             background: white !important;
@@ -232,9 +243,10 @@
             top: 0;
             left: 0;
             z-index: -9999;
-            min-width: 1280px !important; 
+            min-width: 1280px !important; /* 强制宽屏 */
         }
         
+        /* 隐藏杂项 */
         .pdf-mode-active .res-pool-panel,
         .pdf-mode-active .add-staff-area,
         .pdf-mode-active .staff-delete,
@@ -242,19 +254,21 @@
             display: none !important;
         }
 
+        /* 主体容器：左右布局，撑满 */
         .pdf-mode-active .schedule-board {
             width: 100% !important;
             padding: 20px 80px 20px 0px !important;
             margin: 0 !important;
             background: white !important;
             display: flex !important;
+            /* Flex 布局 */
             gap: 30px !important;
             align-items: flex-start !important;
         }
 
         .pdf-mode-active #sched-view-roche {
             display: flex !important;
-            flex-direction: row !important; 
+            flex-direction: row !important; /* 左右排列 */
             width: 100% !important;
             gap: 30px !important;
         }
@@ -267,6 +281,7 @@
             width: auto !important;
         }
 
+        /* 盒子全展开 */
         .pdf-mode-active .schedule-zone,
         .pdf-mode-active .zone-box {
             max-height: none !important;
@@ -308,10 +323,10 @@
     <div class="sidebar">
         <label style="margin-top:0">📊 选择项目组</label>
         <select id="project-select" onchange="switchView()">
-            <option value="roche_cold">❄️ 罗诊冷库 (Roche Cold)</option>
-            <option value="roche_amb">☀️ 罗诊常温 (Roche Amb)</option>
-            <option value="device">⚙️ 器械 (Device)</option>
-            <option value="medicine">🌿 药品 (Medicine)</option>
+            <option value="roche_cold">❄️ 罗诊冷库</option>
+            <option value="roche_amb">☀️ 罗诊常温</option>
+            <option value="device">⚙️ 器械</option>
+            <option value="medicine">🌿 药品</option>
         </select>
 
         <h2>⚙️ 决策参数</h2>
@@ -404,12 +419,14 @@
         </div>
 
         <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px;">
+            
             <div style="display:flex; gap:10px; margin-bottom: 10px;">
                 <button class="btn btn-clear" style="flex:1; margin-bottom:0; font-size:12px; padding: 10px 5px;" onclick="clearData(false)">🗑️ 清空[当前组]业务量</button>
                 <button class="btn btn-clear" style="flex:1; margin-bottom:0; font-size:12px; padding: 10px 5px;" onclick="clearData(true)">🗑️ 清空[所有]业务量</button>
             </div>
 
             <button class="btn" onclick="generatePDF()" style="background-color: #e74c3c; margin-bottom: 10px;">📄 生成常规汇报 PDF</button>
+            
             <button class="btn" id="btn-combined-pdf" onclick="generateCombinedPDF()" style="background-color: #8e44ad; margin-top: 0px; margin-bottom: 10px; display: none;">📄 生成常温+冷库联合版 PDF</button>
 
             <div id="pdf-msg" style="font-size:12px; color:#c0392b; text-align:center; display:none;">生成中，请稍候...</div>
@@ -438,13 +455,13 @@
                 <div id="dash-roche-cold-card" class="dash-card" style="border-top: 5px solid var(--roche-blue); background: #F4F7F9;">
                     <h4 style="color:#2C3E50">❄️ 冷库需求</h4>
                     <div class="metric-val" id="res_roche_cold">0 人</div>
-                    <div class="metric-sub">缺口: <span id="gap_roche_cold">0.0</span> H</div>
+                    <div class="metric-sub">缺口: <span id="gap_roche_cold">0.0</span> 小时</div>
                 </div>
               
                 <div id="dash-roche-amb-card" class="dash-card" style="border-top: 5px solid var(--roche-sand); background: #F9F7F5; margin-left: 15px;">
                     <h4 style="color:#5D5046">☀️ 常温需求</h4>
                     <div class="metric-val" id="res_roche_amb">0 人</div>
-                    <div class="metric-sub">缺口: <span id="gap_roche_amb">0.0</span> H</div>
+                    <div class="metric-sub">缺口: <span id="gap_roche_amb">0.0</span> 小时</div>
                 </div>
             </div>
   
@@ -452,7 +469,7 @@
                 <div class="dash-card" style="border-top: 5px solid var(--device-green); background: var(--device-bg); width: 100%;">
                     <h4 style="color:#556B2F">⚙️ 器械组需求</h4>
                     <div class="metric-val" id="res_device">0 人</div>
-                    <div class="metric-sub">缺口: <span id="gap_device">0.0</span> H</div>
+                    <div class="metric-sub">缺口: <span id="gap_device">0.0</span> 小时</div>
                 </div>
             </div>
 
@@ -460,14 +477,14 @@
                 <div class="dash-card" style="border-top: 5px solid var(--medicine-purple); background: var(--medicine-bg); width: 100%;">
                     <h4 style="color:#555">🌿 药品组需求</h4>
                     <div class="metric-val" id="res_medicine">0 人</div>
-                    <div class="metric-sub">缺口: <span id="gap_medicine">0.0</span> H</div>
+                    <div class="metric-sub">缺口: <span id="gap_medicine">0.0</span> 小时</div>
                 </div>
             </div>
 
             <div class="dash-card dash-total">
                 <h4 style="color:#922B21">🏆 今日总需求</h4>
                 <div class="metric-val" style="color:#922B21" id="res_total">0 人</div>
-                <div class="metric-sub">班次: <span id="res_shift">8</span> H</div>
+                <div class="metric-sub">班次: <span id="res_shift">8</span> 小时</div>
             </div>
         </div>
 
@@ -518,35 +535,35 @@
                     <div class="input-item"><label>国内到货清点 (盒)</label><input type="number" class="data-input" data-uph="80" data-subtype="amb" id="i_qd"></div>
                     <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="i_sj"></div>
                     <div class="input-item"><label>取货 (条)</label><input type="number" class="data-input" data-uph="10" data-subtype="amb" id="i_qh"></div>
-                    <div class="input-item"><label>扫描包装 (PC)</label><input type="number" class="data-input" data-uph="50" data-subtype="amb" id="i_bz"></div>
+                    <div class="input-item"><label>扫描包装 (件)</label><input type="number" class="data-input" data-uph="50" data-subtype="amb" id="i_bz"></div>
                     <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="i_zc"></div>
                 </div></div>
                 <div class="card"><div class="card-header-amb"><h4>📦 罗诊2方</h4></div><div class="input-grid">
-                    <div class="input-item"><label>到货清点 (PC)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="p2_qd"></div>
+                    <div class="input-item"><label>到货清点 (件)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="p2_qd"></div>
                     <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="p2_sj"></div>
                     <div class="input-item"><label>下架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="p2_xj"></div>
-                    <div class="input-item"><label>包装 (PC)</label><input type="number" class="data-input" data-uph="100" data-subtype="amb" id="p2_bz"></div>
+                    <div class="input-item"><label>包装 (件)</label><input type="number" class="data-input" data-uph="100" data-subtype="amb" id="p2_bz"></div>
                     <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="p2_zc"></div>
                 </div></div>
                 <div class="card"><div class="card-header-amb"><h4>🦷 士卓曼</h4></div><div class="input-grid">
-                    <div class="input-item"><label>到货清点 (PC)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="st_qd"></div>
+                    <div class="input-item"><label>到货清点 (件)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="st_qd"></div>
                     <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="st_sj"></div>
                     <div class="input-item"><label>下架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="st_xj"></div>
-                    <div class="input-item"><label>包装 (PC)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="st_bz"></div>
+                    <div class="input-item"><label>包装 (件)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="st_bz"></div>
                     <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="st_zc"></div>
                 </div></div>
                 <div class="card"><div class="card-header-amb"><h4>😷 防疫物资</h4></div><div class="input-grid">
-                    <div class="input-item"><label>到货清点 (PC)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="fy_qd"></div>
+                    <div class="input-item"><label>到货清点 (件)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="fy_qd"></div>
                     <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="fy_sj"></div>
                     <div class="input-item"><label>下架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="fy_xj"></div>
-                    <div class="input-item"><label>包装 (PC)</label><input type="number" class="data-input" data-uph="400" data-subtype="amb" id="fy_bz"></div>
+                    <div class="input-item"><label>包装 (件)</label><input type="number" class="data-input" data-uph="400" data-subtype="amb" id="fy_bz"></div>
                     <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="fy_zc"></div>
                 </div></div>
                 <div class="card"><div class="card-header-amb"><h4>🏥 迈瑞</h4></div><div class="input-grid">
-                    <div class="input-item"><label>到货清点 (PC)</label><input type="number" class="data-input" data-uph="100" data-subtype="amb" id="mr_qd"></div>
+                    <div class="input-item"><label>到货清点 (件)</label><input type="number" class="data-input" data-uph="100" data-subtype="amb" id="mr_qd"></div>
                     <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="mr_sj"></div>
                     <div class="input-item"><label>下架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="mr_xj"></div>
-                    <div class="input-item"><label>包装 (PC)</label><input type="number" class="data-input" data-uph="100" data-subtype="amb" id="mr_bz"></div>
+                    <div class="input-item"><label>包装 (件)</label><input type="number" class="data-input" data-uph="100" data-subtype="amb" id="mr_bz"></div>
                     <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="mr_zc"></div>
                 </div></div>
                 <div class="card"><div class="card-header-amb"><h4>🔄 其他</h4></div><div class="input-grid">
@@ -698,10 +715,12 @@
     const dateStr = date.getFullYear() + "年" + (date.getMonth() + 1) + "月" + date.getDate() + "日";
     document.getElementById('currentDate').innerText = dateStr;
 
+    // 默认初始项目
     let currentProject = 'roche_cold';
     
+    // 全局数据结构：存储所有人员
     let staffData = {
-        pool: [], 
+        pool: [], // 资源池 {id, name, type, origin}
         roche_cold_base: [], roche_cold_sup: [],
         roche_amb_base: [], roche_amb_sup: [],
         device_base: [], device_sup: [],
@@ -724,10 +743,10 @@
         currentProject = select.value;
         const pageTitle = document.getElementById('page-title');
         
+        // 1. 全部隐藏重置
         document.getElementById('view-roche').classList.add('hidden');
         document.getElementById('view-device').classList.add('hidden');
         document.getElementById('view-medicine').classList.add('hidden');
-        
         document.getElementById('formal-roche').classList.add('hidden');
         document.getElementById('formal-device').classList.add('hidden');
         document.getElementById('formal-medicine').classList.add('hidden');
@@ -741,8 +760,10 @@
         document.getElementById('shift_device_div').style.display = 'none';
         document.getElementById('shift_medicine_div').style.display = 'none';
         
+        // 隐藏联合PDF按钮
         document.getElementById('btn-combined-pdf').style.display = 'none';
 
+        // 罗诊内部视图重置（默认先全展示，后续根据冷库/常温隐藏另一半）
         document.getElementById('formal-roche-cold-group').classList.remove('hidden');
         document.getElementById('formal-roche-amb-group').classList.remove('hidden');
         document.getElementById('dash-roche-cold-card').classList.remove('hidden');
@@ -752,46 +773,66 @@
 
         const originSelect = document.getElementById('staff-origin');
 
+        // 2. 根据选项显示对应视图
         if (currentProject === 'roche_cold') {
             document.getElementById('shift_roche_cold_div').style.display = 'flex';
             originSelect.value = '冷库';
+
             pageTitle.innerText = "罗诊冷库项目人力排班决策模型";
             select.style.backgroundColor = "var(--roche-blue)";
+
             document.getElementById('view-roche').classList.remove('hidden');
             document.getElementById('formal-roche').classList.remove('hidden');
             document.getElementById('dash-roche-group').classList.remove('hidden');
-            document.getElementById('dash-roche-group').style.display = 'flex'; 
+            document.getElementById('dash-roche-group').style.display = 'flex';
+            
+            // 隐藏常温模块
             document.getElementById('formal-roche-amb-group').classList.add('hidden');
             document.getElementById('dash-roche-amb-card').classList.add('hidden');
             document.getElementById('view-roche-amb-col').classList.add('hidden');
+            
+            // ★ 显示联合版PDF按钮 ★
             document.getElementById('btn-combined-pdf').style.display = 'block';
+
         } else if (currentProject === 'roche_amb') {
             document.getElementById('shift_roche_amb_div').style.display = 'flex';
             originSelect.value = '常温';
+
             pageTitle.innerText = "罗诊常温项目人力排班决策模型";
             select.style.backgroundColor = "var(--roche-sand)";
+
             document.getElementById('view-roche').classList.remove('hidden');
             document.getElementById('formal-roche').classList.remove('hidden');
             document.getElementById('dash-roche-group').classList.remove('hidden');
-            document.getElementById('dash-roche-group').style.display = 'flex'; 
+            document.getElementById('dash-roche-group').style.display = 'flex';
+            
+            // 隐藏冷库模块
             document.getElementById('formal-roche-cold-group').classList.add('hidden');
             document.getElementById('dash-roche-cold-card').classList.add('hidden');
             document.getElementById('view-roche-cold-col').classList.add('hidden');
+            
+            // ★ 显示联合版PDF按钮 ★
             document.getElementById('btn-combined-pdf').style.display = 'block';
+
         } else if (currentProject === 'device') {
             document.getElementById('shift_device_div').style.display = 'flex';
             originSelect.value = '器械';
+
             pageTitle.innerText = "器械项目人力排班决策模型";
             select.style.backgroundColor = "var(--device-green)";
+            
             document.getElementById('view-device').classList.remove('hidden');
             document.getElementById('formal-device').classList.remove('hidden');
             document.getElementById('dash-device-group').classList.remove('hidden');
             document.getElementById('dash-device-group').style.display = 'flex';
+
         } else if (currentProject === 'medicine') {
             document.getElementById('shift_medicine_div').style.display = 'flex';
             originSelect.value = '药品';
+
             pageTitle.innerText = "药品项目人力排班决策模型";
             select.style.backgroundColor = "var(--medicine-purple)";
+            
             document.getElementById('view-medicine').classList.remove('hidden');
             document.getElementById('formal-medicine').classList.remove('hidden');
             document.getElementById('dash-medicine-group').classList.remove('hidden');
@@ -800,103 +841,64 @@
         update();
     }
 
-    /* === V16.7 终极初始化逻辑 (确保链接数据在刷新后依然持久) === */
+/* === V16.4 终极初始化引擎 (保留 V16.5 的原生无损加载逻辑) === */
     function init() {
         const params = new URLSearchParams(window.location.search);
-        loadStaffData(); 
-        let alertMsg = "";
-
-        // 核心改动：先循环一次 URL 参数，把能存的都强制存入 LocalStorage
-        // 这解决了刷新瞬间数据还没被 DOM 事件触发保存就被覆盖的问题
-        params.forEach((value, key) => {
-            if (key !== 'sdata' && key !== 'pure_source') {
-                localStorage.setItem(key, value);
-            }
-        });
-
+        // 1. 先加载本地数据
+        loadStaffData();
+        
+        // 2. 尝试从链接加载排班数据
         if (params.has('sdata')) {
             try {
                 const compressed = params.get('sdata');
                 const jsonStr = decodeURIComponent(atob(compressed));
                 const linkData = JSON.parse(jsonStr);
-                const isPure = params.has('pure_source');
-                const pureSource = params.get('pure_source');
-
-                if (!isPure) {
-                    document.querySelectorAll('.data-input').forEach(input => {
-                        input.value = ""; localStorage.removeItem(input.id);
-                    });
-                } else {
-                    if (pureSource === 'roche_cold') document.querySelectorAll('#view-roche-cold-col .data-input').forEach(i => { i.value=""; localStorage.removeItem(i.id); });
-                    if (pureSource === 'roche_amb') document.querySelectorAll('#view-roche-amb-col .data-input').forEach(i => { i.value=""; localStorage.removeItem(i.id); });
-                    if (pureSource === 'device') document.querySelectorAll('#view-device .data-input').forEach(i => { i.value=""; localStorage.removeItem(i.id); });
-                    if (pureSource === 'medicine') document.querySelectorAll('#view-medicine .data-input').forEach(i => { i.value=""; localStorage.removeItem(i.id); });
-                    
-                    const sourceNames = {'roche_cold':'罗诊冷库', 'roche_amb':'罗诊常温', 'device':'器械', 'medicine':'药品'};
-                    alertMsg = `✅ 已成功合并 [${sourceNames[pureSource]}] 的数据！\n您本地的设置不受影响。`;
-                }
-
-                if (!isPure) {
-                    staffData = linkData; 
-                } else {
-                    for (let key in linkData) {
-                        if (key !== 'pool' && staffData[key] && Array.isArray(linkData[key])) {
-                            staffData.pool.push(...staffData[key]);
-                            staffData[key] = [];
-                        }
-                    }
-                    for (let key in linkData) {
-                        if (Array.isArray(linkData[key])) {
-                            staffData[key] = linkData[key];
-                        }
-                    }
-                }
-
-                let workingNames = new Set();
+                
+                // 【V16.5 原生无损合并规则】：仅当链接数据该区域非空时，才覆盖对应区域数据
                 for (let key in staffData) {
-                    if (key !== 'pool') {
-                        staffData[key].forEach(staff => workingNames.add(staff.name));
+                    if (linkData[key] && Array.isArray(linkData[key])) {
+                        staffData[key] = linkData[key];
                     }
                 }
-
-                let uniquePool = [];
-                let poolNames = new Set();
-                staffData.pool.forEach(staff => {
-                    if (!workingNames.has(staff.name) && !poolNames.has(staff.name)) {
-                        uniquePool.push(staff);
-                        poolNames.add(staff.name);
-                    }
-                });
-                staffData.pool = uniquePool;
                 saveStaffData();
             } catch (e) {
-                console.error("链接数据解析失败", e);
+                console.error("链接排班数据解析失败", e);
             }
         }
 
-        // 第二次循环：同步 DOM 界面
+        // 3. 处理输入框的数值回填
         document.querySelectorAll('input, select').forEach(el => {
-            const storedVal = localStorage.getItem(el.id);
-            if (storedVal !== null) el.value = storedVal;
+            if (el.id && params.has(el.id)) {
+                // 如果是链接传来的数值，优先填入并覆盖本地记忆
+                el.value = params.get(el.id);
+                localStorage.setItem(el.id, el.value);
+            } else if (el.id) {
+                // 否则读取本地记忆
+                const storedVal = localStorage.getItem(el.id);
+                if (storedVal !== null) el.value = storedVal;
+            }
         });
         
-        // 专门处理项目选择器的持久化
-        const storedProj = localStorage.getItem('project-select');
-        document.getElementById('project-select').value = params.get('project-select') || storedProj || 'roche_cold';
-        localStorage.setItem('project-select', document.getElementById('project-select').value);
+        if(params.has('project-select')){
+            document.getElementById('project-select').value = params.get('project-select');
+        } else {
+            // 默认显示上次的项目，若无则默认冷库
+            const storedProj = localStorage.getItem('project-select');
+            document.getElementById('project-select').value = storedProj || 'roche_cold';
+        }
         
         switchView();
-        if(alertMsg) setTimeout(() => alert(alertMsg), 500);
     }
 
     function update(e) {
         calcStaff();
-        if (e && e.target && e.target.id) { 
-            localStorage.setItem(e.target.id, e.target.value); 
-        } else { 
-            document.querySelectorAll('input, select').forEach(el => { 
-                if(el.id) localStorage.setItem(el.id, el.value); 
-            }); 
+        // ★ 全局自动保存 ★
+        if (e && e.target && e.target.id) {
+            localStorage.setItem(e.target.id, e.target.value);
+        } else {
+            document.querySelectorAll('input, select').forEach(el => {
+                if(el.id) localStorage.setItem(el.id, el.value);
+            });
         }
 
         const eff = parseFloat(document.getElementById('eff').value);
@@ -910,41 +912,47 @@
         document.getElementById('disp_eff').innerText = eff.toFixed(2);
         document.getElementById('disp_oee').innerText = oee.toFixed(2);
         
-        if(currentProject === 'roche') { 
-            document.getElementById('res_shift').innerText = shiftCold === shiftAmb ? shiftCold : `❄️${shiftCold}/☀️${shiftAmb}`; 
-        } else if (currentProject === 'roche_cold') { 
-            document.getElementById('res_shift').innerText = shiftCold; 
-        } else if (currentProject === 'roche_amb') { 
-            document.getElementById('res_shift').innerText = shiftAmb; 
-        } else if (currentProject === 'device') { 
-            document.getElementById('res_shift').innerText = shiftDevice; 
-        } else { 
-            document.getElementById('res_shift').innerText = shiftMedicine; 
+        if(currentProject === 'roche') {
+             document.getElementById('res_shift').innerText = shiftCold === shiftAmb ? shiftCold : `❄️${shiftCold} / ☀️${shiftAmb}`;
+        } else if (currentProject === 'roche_cold') {
+             document.getElementById('res_shift').innerText = shiftCold;
+        } else if (currentProject === 'roche_amb') {
+             document.getElementById('res_shift').innerText = shiftAmb;
+        } else if (currentProject === 'device') {
+             document.getElementById('res_shift').innerText = shiftDevice;
+        } else {
+             document.getElementById('res_shift').innerText = shiftMedicine;
         }
 
-        let totalNeed = 0; 
+        let totalNeed = 0;
         let chartData = [];
-        
+        const baseProject = currentProject.split('_')[0];
+
         if (currentProject.startsWith('roche')) {
-            const capCold = shiftCold * oee * eff; 
+            const capCold = shiftCold * oee * eff;
             const capAmb = shiftAmb * oee * eff;   
+
             const fcCold = parseInt(document.getElementById('fc_roche_cold').value) || 0;
             const fcAmb = parseInt(document.getElementById('fc_roche_amb').value) || 0;
             let hoursCold = 0, hoursAmb = 0;
 
             document.querySelectorAll('#view-roche .data-input').forEach(input => {
+                // 跳过被隐藏的列，防止数据串线
                 if (input.closest('.col').classList.contains('hidden')) return;
+
                 const val = parseInt(input.value) || 0;
                 if(val > 0) {
-                    const uph = parseFloat(input.dataset.uph); 
+                    const uph = parseFloat(input.dataset.uph);
                     const hours = val / uph;
                     const isAmb = input.dataset.subtype === 'amb';
-                    const groupTitle = input.closest('.card').querySelector('h4').innerText.split(' ')[1] || "";
                     const label = input.previousElementSibling.innerText;
-                    
+                    const groupTitle = input.closest('.card').querySelector('h4').innerText.split(' ')[1] || "";
+                    const fullName = groupTitle ? `${groupTitle}-${label}` : label;
+
                     if(isAmb) hoursAmb += hours; else hoursCold += hours;
+                    
                     chartData.push({ 
-                        name: groupTitle ? `${groupTitle}-${label}` : label, 
+                        name: fullName, 
                         hours: hours, 
                         people: hours / (isAmb ? capAmb : capCold), 
                         color: isAmb ? 'var(--roche-sand)' : 'var(--roche-blue)' 
@@ -953,7 +961,8 @@
             });
             const gapCold = Math.max(0, (hoursCold / oee) - (fcCold * shiftCold));
             const gapAmb = Math.max(0, (hoursAmb / oee) - (fcAmb * shiftAmb));
-            const needCold = Math.ceil(gapCold / capCold); 
+            
+            const needCold = Math.ceil(gapCold / capCold);
             const needAmb = Math.ceil(gapAmb / capAmb);
 
             document.getElementById('res_roche_cold').innerText = needCold + " 人";
@@ -961,70 +970,71 @@
             document.getElementById('res_roche_amb').innerText = needAmb + " 人";
             document.getElementById('gap_roche_amb').innerText = gapAmb.toFixed(1);
             
-            if (currentProject === 'roche') totalNeed = needCold + needAmb;
-            else if (currentProject === 'roche_cold') totalNeed = needCold; 
-            else totalNeed = needAmb;
-
+            if (currentProject === 'roche') {
+                totalNeed = needCold + needAmb; // 用于联合生成
+            } else if (currentProject === 'roche_cold') {
+                totalNeed = needCold;
+            } else {
+                totalNeed = needAmb;
+            }
+            
         } else if (currentProject === 'device') {
-            const capGen = shiftDevice * oee * eff; 
+            const capGen = shiftDevice * oee * eff;
             const fc = parseInt(document.getElementById('fc_device').value) || 0;
             let totalHours = 0;
             document.querySelectorAll('#view-device .data-input').forEach(input => {
                 const val = parseInt(input.value) || 0;
                 if(val > 0) {
-                    const uph = parseFloat(input.dataset.uph); 
+                    const uph = parseFloat(input.dataset.uph);
                     const hours = val / uph;
+                    const label = input.previousElementSibling.innerText;
+                    const groupTitle = input.closest('.card').querySelector('h4').innerText.split(' ')[1] || "";
+                    const fullName = `${groupTitle}-${label}`;
                     totalHours += hours;
-                    chartData.push({ 
-                        name: input.previousElementSibling.innerText, 
-                        hours: hours, 
-                        people: hours / capGen, 
-                        color: 'var(--device-green)' 
-                    });
+                    chartData.push({ name: fullName, hours: hours, people: hours / capGen, color: 'var(--device-green)' });
                 }
             });
             const gap = Math.max(0, (totalHours / oee) - (fc * shiftDevice)); 
             const need = Math.ceil(gap / capGen);
             document.getElementById('res_device').innerText = need + " 人";
-            document.getElementById('gap_device').innerText = gap.toFixed(1); 
+            document.getElementById('gap_device').innerText = gap.toFixed(1);
             totalNeed = need;
         } else if (currentProject === 'medicine') {
-            const capGen = shiftMedicine * oee * eff; 
+            const capGen = shiftMedicine * oee * eff;
             const fc = parseInt(document.getElementById('fc_medicine').value) || 0;
             let totalHours = 0;
             document.querySelectorAll('#view-medicine .data-input').forEach(input => {
                 const val = parseInt(input.value) || 0;
                 if(val > 0) {
-                    const uph = parseFloat(input.dataset.uph); 
+                    const uph = parseFloat(input.dataset.uph);
                     const hours = val / uph;
+                    const label = input.previousElementSibling.innerText;
+                    const groupTitle = input.closest('.card').querySelector('h4').innerText.split(' ')[1] || "";
+                    const fullName = `${groupTitle}-${label}`;
                     totalHours += hours;
-                    chartData.push({ 
-                        name: input.previousElementSibling.innerText, 
-                        hours: hours, 
-                        people: hours / capGen, 
-                        color: 'var(--medicine-purple)' 
-                    });
+                    chartData.push({ name: fullName, hours: hours, people: hours / capGen, color: 'var(--medicine-purple)' });
                 }
             });
             const gap = Math.max(0, (totalHours / oee) - (fc * shiftMedicine)); 
             const need = Math.ceil(gap / capGen);
             document.getElementById('res_medicine').innerText = need + " 人";
-            document.getElementById('gap_medicine').innerText = gap.toFixed(1); 
+            document.getElementById('gap_medicine').innerText = gap.toFixed(1);
             totalNeed = need;
         }
+
         document.getElementById('res_total').innerText = totalNeed + " 人";
-        renderChart(chartData); 
+        renderChart(chartData);
         syncGapBlocks();
     }
 
     function renderChart(data) {
-        const container = document.getElementById('chart-area'); 
+        const container = document.getElementById('chart-area');
         container.innerHTML = "";
-        if (data.length === 0) { 
-            container.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">暂无输入数据</div>'; 
-            return; 
+        if (data.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">暂无输入数据</div>';
+            return;
         }
-        data.sort((a, b) => b.hours - a.hours); 
+        data.sort((a, b) => b.hours - a.hours);
         const maxHours = data[0].hours;
         data.forEach(item => {
             const widthPct = (item.hours / maxHours) * 100;
@@ -1032,87 +1042,134 @@
             const row = document.createElement('div');
             row.className = 'chart-row';
             row.innerHTML = `<div class="chart-label" title="${item.name}">${item.name}</div>
-                <div class="chart-bar-area"><div class="chart-bar" style="width: ${widthPct}%; background-color: ${item.color}">${item.hours.toFixed(1)} H</div></div>
+                <div class="chart-bar-area"><div class="chart-bar" style="width: ${widthPct}%; background-color: ${item.color}">${item.hours.toFixed(1)} 小时</div></div>
                 <div class="chart-val">推荐: ${peopleNum}人</div>`;
             container.appendChild(row);
         });
     }
 
+    /* === V16.5 仅清空业务量 (不再退回排班人员) === */
     function clearData(isFull = false) {
-        const msg = isFull ? "确定要清空【所有组】的业务量吗？" : "确定要清空【当前组】的业务量吗？";
+        const msg = isFull 
+            ? "确定要清空【所有组】的业务量数据吗？\n\n（注意：排班沙盘里的人员将保持原封不动）" 
+            : "确定要清空【当前组】的业务量数据吗？\n\n（注意：排班沙盘里的人员将保持原封不动）";
+            
         if(confirm(msg)) {
             if (isFull) {
-                document.querySelectorAll('.data-input').forEach(input => { input.value = ""; localStorage.removeItem(input.id); });
+                // 清空全部业务数据
+                document.querySelectorAll('.data-input').forEach(input => {
+                    input.value = ""; 
+                    if(input.id) localStorage.removeItem(input.id); 
+                });
             } else {
+                // 仅清空当前激活视窗内的业务数据
                 const baseProject = currentProject.split('_')[0];
                 const activeViewId = baseProject === 'roche' ? 'view-roche' : `view-${baseProject}`;
                 document.querySelectorAll(`#${activeViewId} .data-input`).forEach(input => {
-                    if (!input.closest('.col').classList.contains('hidden')) { input.value = ""; localStorage.removeItem(input.id); }
+                    if (!input.closest('.col').classList.contains('hidden')) {
+                        input.value = ""; 
+                        if(input.id) localStorage.removeItem(input.id); 
+                    }
                 });
             }
             update(); 
         }
     }
 
+    /* === V16.5 沙盘专属：一键回池 === */
     function returnAllToPool() {
-        if(confirm("确定要将全部在岗人员退回资源池吗？")) {
+        if(confirm("确定要将【所有组】的在岗排班人员，全部退回左侧资源池吗？")) {
             const zones = ['roche_cold_base', 'roche_cold_sup', 'roche_amb_base', 'roche_amb_sup', 'device_base', 'device_sup', 'medicine_base', 'medicine_sup'];
-            zones.forEach(zone => { 
-                if (staffData[zone] && staffData[zone].length > 0) { 
-                    staffData.pool.push(...staffData[zone]); 
+            zones.forEach(zone => {
+                if (staffData[zone] && staffData[zone].length > 0) {
+                    staffData.pool.push(...staffData[zone]);
                     staffData[zone] = []; 
-                } 
+                }
             });
-            saveStaffData(); renderScheduler();
+            saveStaffData();
+            renderScheduler();
         }
     }
 
+    /* === V16.5 沙盘专属：一键清空资源池 === */
     function clearResourcePool() {
-        if(confirm("确定要删除资源池里所有人吗？")) { 
-            staffData.pool = []; 
-            saveStaffData(); renderScheduler(); 
+        if(confirm("确定要【彻底删除】左侧资源池里的所有人吗？\n\n（提示：右侧已经安排在岗的人员不受影响）")) {
+            staffData.pool = [];
+            saveStaffData();
+            renderScheduler();
         }
     }
 
-    function openScheduler() { document.getElementById('scheduler-modal').style.display = 'flex'; loadStaffData(); renderScheduler(); syncGapBlocks(); }
-    function closeScheduler() { document.getElementById('scheduler-modal').style.display = 'none'; saveStaffData(); }
+    /* === 排班沙盘核心逻辑 === */
+    function openScheduler() {
+        document.getElementById('scheduler-modal').style.display = 'flex';
+        loadStaffData();
+        renderScheduler();
+        syncGapBlocks();
+    }
+
+    function closeScheduler() {
+        document.getElementById('scheduler-modal').style.display = 'none';
+        saveStaffData();
+    }
 
     function loadStaffData() {
-        const stored = localStorage.getItem('staffData_v6');
-        if (stored) { try { staffData = JSON.parse(stored); } catch(e) { console.error(e); } }
+        const stored = localStorage.getItem('staffData_v5');
+        if (stored) {
+            try { staffData = JSON.parse(stored);
+            } catch(e) { console.error(e); }
+        }
         initSortable();
     }
 
-    function saveStaffData() { 
-        localStorage.setItem('staffData_v6', JSON.stringify(staffData)); 
-        updateMainInputsFromScheduler(); 
+    function saveStaffData() {
+        localStorage.setItem('staffData_v5', JSON.stringify(staffData));
+        updateMainInputsFromScheduler();
     }
 
     function updateMainInputsFromScheduler() {
-        const map = { 'roche_cold_base': 'base_roche_cold', 'roche_cold_sup': 'sup_roche_cold', 'roche_amb_base': 'base_roche_amb', 'roche_amb_sup': 'sup_roche_amb', 'device_base': 'base_device', 'device_sup': 'sup_device', 'medicine_base': 'base_medicine', 'medicine_sup': 'sup_medicine' };
+        const map = {
+            'roche_cold_base': 'base_roche_cold', 'roche_cold_sup': 'sup_roche_cold',
+            'roche_amb_base': 'base_roche_amb', 'roche_amb_sup': 'sup_roche_amb',
+            'device_base': 'base_device', 'device_sup': 'sup_device',
+            'medicine_base': 'base_medicine', 'medicine_sup': 'sup_medicine'
+        };
         for (let key in map) {
-            const count = staffData[key] ? staffData[key].length : 0; 
-            const inputId = map[key]; 
+            const count = staffData[key] ? staffData[key].length : 0;
+            const inputId = map[key];
             const el = document.getElementById(inputId);
-            if (el) { 
-                el.value = count; el.classList.add('input-readonly'); el.readOnly = true; 
-                const spanId = 'count-' + key.replace(/_/g, '-'); 
-                const countSpan = document.getElementById(spanId); if(countSpan) countSpan.innerText = count; 
+            if (el) {
+                el.value = count;
+                el.classList.add('input-readonly');
+                el.readOnly = true;
+                const spanId = 'count-' + key.replace(/_/g, '-');
+                const countSpan = document.getElementById(spanId);
+                if(countSpan) countSpan.innerText = count;
             }
         }
-        update(); syncGapBlocks();
+        update(); 
+        syncGapBlocks();
     }
 
     function renderScheduler() {
-        document.getElementById('sched-view-roche').classList.add('hidden'); 
+        document.getElementById('sched-view-roche').classList.add('hidden');
         document.getElementById('sched-view-generic').classList.add('hidden');
-        document.getElementById('sched-roche-cold-col').style.display = 'flex'; 
+        
+        // 恢复罗诊内部两列的显示
+        document.getElementById('sched-roche-cold-col').style.display = 'flex';
         document.getElementById('sched-roche-amb-col').style.display = 'flex';
+
         if (currentProject.startsWith('roche')) {
-            document.getElementById('sched-view-roche').classList.remove('hidden'); 
+            document.getElementById('sched-view-roche').classList.remove('hidden');
             document.getElementById('sched-view-roche').style.display = 'flex';
-            if (currentProject === 'roche_cold') document.getElementById('sched-roche-amb-col').style.display = 'none';
-            else if (currentProject === 'roche_amb') document.getElementById('sched-roche-cold-col').style.display = 'none';
+            
+            // 根据冷库/常温隐藏不需要的那一半沙盘
+            if (currentProject === 'roche_cold') {
+                document.getElementById('sched-roche-amb-col').style.display = 'none';
+            } else if (currentProject === 'roche_amb') {
+                document.getElementById('sched-roche-cold-col').style.display = 'none';
+            }
+
         } else {
             document.getElementById('sched-view-generic').classList.remove('hidden');
             const title = currentProject === 'device' ? '⚙️ 器械组排班' : '🌿 药品组排班';
@@ -1122,61 +1179,201 @@
             document.getElementById('count-generic-base').id = `count-${currentProject}-base`;
             document.getElementById('count-generic-sup').id = `count-${currentProject}-sup`;
         }
-        const poolEl = document.getElementById('pool-container'); poolEl.innerHTML = '';
-        staffData.pool.forEach((staff, idx) => { poolEl.appendChild(createStaffEl(staff, 'pool', idx)); });
+
+        const poolEl = document.getElementById('pool-container');
+        poolEl.innerHTML = '';
+        staffData.pool.forEach((staff, idx) => {
+            poolEl.appendChild(createStaffEl(staff, 'pool', idx));
+        });
         const zones = ['roche_cold_base', 'roche_cold_sup', 'roche_amb_base', 'roche_amb_sup', 'device_base', 'device_sup', 'medicine_base', 'medicine_sup'];
-        zones.forEach(zoneKey => { const el = document.getElementById('zone_' + zoneKey); if(el) { el.innerHTML = ''; if(staffData[zoneKey]) { staffData[zoneKey].forEach((staff, idx) => { el.appendChild(createStaffEl(staff, zoneKey, idx)); }); } } });
+        zones.forEach(zoneKey => {
+            const el = document.getElementById('zone_' + zoneKey);
+            if(el) {
+                el.innerHTML = '';
+                if(staffData[zoneKey]) {
+                    staffData[zoneKey].forEach((staff, idx) => {
+                        el.appendChild(createStaffEl(staff, zoneKey, idx));
+                    });
+                }
+            }
+        });
         updateMainInputsFromScheduler();
     }
 
     function createStaffEl(staff, sourceKey, idx) {
-        const div = document.createElement('div'); div.className = `staff-card staff-type-${staff.type}`;
-        let currentOrigin = ''; if (currentProject === 'roche_cold' || currentProject === 'roche') currentOrigin = '冷库'; else if (currentProject === 'roche_amb') currentOrigin = '常温'; else if (currentProject === 'device') currentOrigin = '器械'; else if (currentProject === 'medicine') currentOrigin = '药品';
-        let zoneOrigin = currentOrigin; if (sourceKey.includes('roche_cold')) zoneOrigin = '冷库'; else if (sourceKey.includes('roche_amb')) zoneOrigin = '常温'; else if (sourceKey.includes('device')) zoneOrigin = '器械'; else if (sourceKey.includes('medicine')) zoneOrigin = '药品';
-        let displayName = staff.name; if (staff.origin && staff.origin !== zoneOrigin) { displayName = `(${staff.origin})${staff.name}`; }
+        const div = document.createElement('div');
+        div.className = `staff-card staff-type-${staff.type}`;
+        
+        // 解析当前全局项目环境归属哪个组
+        let currentOrigin = '';
+        if (currentProject === 'roche_cold' || currentProject === 'roche') currentOrigin = '冷库';
+        else if (currentProject === 'roche_amb') currentOrigin = '常温';
+        else if (currentProject === 'device') currentOrigin = '器械';
+        else if (currentProject === 'medicine') currentOrigin = '药品';
+
+        // 解析这个名片目前所处的容器归属哪个组
+        let zoneOrigin = currentOrigin;
+        if (sourceKey.includes('roche_cold')) zoneOrigin = '冷库';
+        else if (sourceKey.includes('roche_amb')) zoneOrigin = '常温';
+        else if (sourceKey.includes('device')) zoneOrigin = '器械';
+        else if (sourceKey.includes('medicine')) zoneOrigin = '药品';
+
+        let displayName = staff.name;
+        
+        // 如果该人员有跨组属性，并且不属于当前所在的组，带上来源名片标识
+        if (staff.origin && staff.origin !== zoneOrigin) {
+            displayName = `(${staff.origin})${staff.name}`;
+        }
+
         div.innerHTML = `${displayName} <span class="staff-delete" onclick="removeStaff('${sourceKey}', ${idx})">×</span>`;
-        div.dataset.id = staff.id; return div;
+        div.dataset.id = staff.id; 
+        return div;
     }
 
+    // ★ 智能防重名拦截 ★
     function addNewStaff() {
-        const input = document.getElementById('new-staff-names'); const names = input.value.trim(); if(!names) return;
-        const type = document.querySelector('input[name="staffType"]:checked').value; const originVal = document.getElementById('staff-origin').value;
-        const nameArr = names.split(/[\s,，]+/); let duplicates = []; let addedCount = 0;  
+        const input = document.getElementById('new-staff-names');
+        const names = input.value.trim();
+        if(!names) return;
+        const type = document.querySelector('input[name="staffType"]:checked').value;
+        const originVal = document.getElementById('staff-origin').value;
+
+        const nameArr = names.split(/[\s,，]+/);
+        let duplicates = []; 
+        let addedCount = 0;  
+
         nameArr.forEach(n => {
             if(n) {
-                let isExist = false; for (let key in staffData) { if (staffData[key].some(staff => staff.name === n)) { isExist = true; break; } }
-                if (isExist) { duplicates.push(n); } else { staffData.pool.push({ id: Date.now() + Math.random(), name: n, type: type, origin: originVal }); addedCount++; }
+                // 全局查重
+                let isExist = false;
+                for (let key in staffData) {
+                    if (staffData[key].some(staff => staff.name === n)) {
+                        isExist = true;
+                        break;
+                    }
+                }
+
+                if (isExist) {
+                    duplicates.push(n);
+                } else {
+                    staffData.pool.push({
+                        id: Date.now() + Math.random(),
+                        name: n,
+                        type: type,
+                        origin: originVal
+                    });
+                    addedCount++;
+                }
             }
         });
-        if (duplicates.length > 0) alert(`已过滤重复：【 ${duplicates.join('， ')} 】`);
-        if (addedCount > 0 || duplicates.length > 0) { input.value = ''; saveStaffData(); renderScheduler(); }
+
+        if (duplicates.length > 0) {
+            alert(`以下人员已在资源池或排班中，为防重复已自动过滤：\n【 ${duplicates.join('， ')} 】`);
+        }
+
+        if (addedCount > 0 || duplicates.length > 0) {
+            input.value = '';
+            saveStaffData();
+            renderScheduler();
+        }
     }
 
-    function removeStaff(sourceKey, idx) { const staff = staffData[sourceKey].splice(idx, 1)[0]; if (sourceKey !== 'pool') staffData.pool.push(staff); saveStaffData(); renderScheduler(); }
+    function removeStaff(sourceKey, idx) {
+        const staff = staffData[sourceKey].splice(idx, 1)[0];
+        if (sourceKey !== 'pool') staffData.pool.push(staff);
+        saveStaffData();
+        renderScheduler();
+    }
 
     function syncGapBlocks() {
-        const map = { 'gap_roche_cold_area': 'res_roche_cold', 'gap_roche_amb_area': 'res_roche_amb', 'gap_generic_area': currentProject === 'device' ? 'res_device' : 'res_medicine' };
-        ['gap_roche_cold_area', 'gap_roche_amb_area', 'gap_generic_area'].forEach(id => { const el = document.getElementById(id); if(el) el.innerHTML = ''; });
+        const map = {
+            'gap_roche_cold_area': 'res_roche_cold',
+            'gap_roche_amb_area': 'res_roche_amb',
+            'gap_generic_area': currentProject === 'device' ? 'res_device' : 'res_medicine'
+        };
+        ['gap_roche_cold_area', 'gap_roche_amb_area', 'gap_generic_area'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.innerHTML = '';
+        });
         for (let areaId in map) {
-            if (!currentProject.startsWith('roche') && areaId.includes('roche')) continue; if (currentProject.startsWith('roche') && areaId === 'gap_generic_area') continue;
-            const targetId = map[areaId]; const needText = document.getElementById(targetId)?.innerText || "0"; const needCount = parseInt(needText) || 0; 
+            // 如果不是罗诊，且区域ID包含roche，跳过
+            if (!currentProject.startsWith('roche') && areaId.includes('roche')) continue;
+            // 如果是罗诊，且区域ID是通用的，跳过
+            if (currentProject.startsWith('roche') && areaId === 'gap_generic_area') continue;
+
+            const targetId = map[areaId];
+            const needText = document.getElementById(targetId)?.innerText || "0";
+            const needCount = parseInt(needText) || 0; 
+            
             const container = document.getElementById(areaId);
-            if (container) { if (needCount > 0) { for(let i=0; i<needCount; i++) { const block = document.createElement('div'); block.className = 'gap-block'; block.innerText = `缺口${i+1}`; container.appendChild(block); } } else { container.innerHTML = '<div style="font-size:12px; color:#27ae60; padding:5px; font-weight:bold;">✨ 人员充足</div>'; } }
+            if (container) {
+                if (needCount > 0) {
+                    for(let i=0; i<needCount; i++) {
+                        const block = document.createElement('div');
+                        block.className = 'gap-block';
+                        block.innerText = `缺口${i+1}`;
+                        container.appendChild(block);
+                    }
+                } else {
+                    container.innerHTML = '<div style="font-size:12px; color:#27ae60; padding:5px; font-weight:bold;">✨ 人员充足 (已满足需求)</div>';
+                }
+            }
         }
     }
 
     function initSortable() {
         const containers = document.querySelectorAll('.pool-container, .sortable-zone');
-        containers.forEach(el => { if(el._sortable) el._sortable.destroy(); el._sortable = new Sortable(el, { group: 'staff', animation: 150, ghostClass: 'sortable-ghost', onEnd: function (evt) { const fromKey = evt.from.id === 'pool-container' ? 'pool' : evt.from.id.replace('zone_', ''); const toKey = evt.to.id === 'pool-container' ? 'pool' : evt.to.id.replace('zone_', ''); if (fromKey === toKey && evt.newIndex === evt.oldIndex) return; const movedItem = staffData[fromKey].splice(evt.oldIndex, 1)[0]; staffData[toKey].splice(evt.newIndex, 0, movedItem); saveStaffData(); } }); });
+        containers.forEach(el => {
+            if(el._sortable) el._sortable.destroy();
+            el._sortable = new Sortable(el, {
+                group: 'staff',
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                onEnd: function (evt) {
+                    const itemEl = evt.item;
+                    const fromKey = evt.from.id === 'pool-container' ? 'pool' : evt.from.id.replace('zone_', '');
+                    const toKey = evt.to.id === 'pool-container' ? 'pool' : evt.to.id.replace('zone_', '');
+                
+                    if (fromKey === toKey && evt.newIndex === evt.oldIndex) return;
+                    const movedItem = staffData[fromKey].splice(evt.oldIndex, 1)[0];
+                    staffData[toKey].splice(evt.newIndex, 0, movedItem);
+                    saveStaffData();
+                }
+            });
+        });
     }
 
+    /* === V16.2 联合版 PDF 魔法实现 === */
     async function generateCombinedPDF() {
-        document.getElementById('formal-roche-cold-group').classList.remove('hidden'); document.getElementById('dash-roche-cold-card').classList.remove('hidden'); document.getElementById('view-roche-cold-col').classList.remove('hidden'); document.getElementById('sched-roche-cold-col').style.display = 'flex';
-        document.getElementById('formal-roche-amb-group').classList.remove('hidden'); document.getElementById('dash-roche-amb-card').classList.remove('hidden'); document.getElementById('view-roche-amb-col').classList.remove('hidden'); document.getElementById('sched-roche-amb-col').style.display = 'flex';
-        const tempProject = currentProject; currentProject = 'roche'; document.getElementById('page-title').innerText = "罗诊项目人力排班决策模型"; update(); await generatePDF(true);
-        currentProject = tempProject; switchView(); update();
+        // 瞬间：展示出冷库和常温所有的内容，合体成完整版罗诊
+        document.getElementById('formal-roche-cold-group').classList.remove('hidden');
+        document.getElementById('dash-roche-cold-card').classList.remove('hidden');
+        document.getElementById('view-roche-cold-col').classList.remove('hidden');
+        document.getElementById('sched-roche-cold-col').style.display = 'flex';
+
+        document.getElementById('formal-roche-amb-group').classList.remove('hidden');
+        document.getElementById('dash-roche-amb-card').classList.remove('hidden');
+        document.getElementById('view-roche-amb-col').classList.remove('hidden');
+        document.getElementById('sched-roche-amb-col').style.display = 'flex';
+        
+        // 瞬间：修改系统状态，让其认为当前是 "roche"
+        const tempProject = currentProject;
+        currentProject = 'roche'; 
+        document.getElementById('page-title').innerText = "罗诊项目人力排班决策模型";
+        
+        // 强制重新算一次，让柱状图包含两边的数据
+        update(); 
+
+        // 执行原有的截屏和生成 PDF 逻辑（传入一个标志位，告诉它这是联合生成的）
+        await generatePDF(true);
+
+        // 瞬间：恢复现场
+        currentProject = tempProject;
+        switchView(); // 重新按当前模式隐藏另一半
+        update(); // 重新计算柱状图回原始状态
     }
 
+    /* === V15.3 PDF生成 === */
     async function generatePDF(isCombined = false) {
         const { jsPDF } = window.jspdf;
         const pdfContainer = document.getElementById('pdf-container');
@@ -1184,77 +1381,145 @@
         if(msgEl) msgEl.style.display = 'block';
 
         let effectiveProject = isCombined ? 'roche' : currentProject;
+
+        // ★ 核心排查修复点 1：强制预渲染沙盘以生成小人卡片，解决截图空白问题 ★
         renderScheduler();
 
-        const schedRoche = document.getElementById('sched-view-roche');
-        const schedGeneric = document.getElementById('sched-view-generic');
-        const colCold = document.getElementById('sched-roche-cold-col');
-        const colAmb = document.getElementById('sched-roche-amb-col');
-
-        if (effectiveProject.startsWith('roche')) {
-            schedRoche.classList.remove('hidden'); schedRoche.style.display = 'flex';
-            schedGeneric.classList.add('hidden');
-            if (effectiveProject === 'roche_cold') { colCold.style.display = 'flex'; colAmb.style.display = 'none'; }
-            else if (effectiveProject === 'roche_amb') { colCold.style.display = 'none'; colAmb.style.display = 'flex'; }
-            else { colCold.style.display = 'flex'; colAmb.style.display = 'flex'; }
-        } else {
-            schedRoche.classList.add('hidden'); schedGeneric.classList.remove('hidden'); schedGeneric.style.display = 'flex';
+        // 【★ 核心修复：单独生成PDF时，强制隐藏另一个组的排班沙盘列 ★】
+        if (effectiveProject === 'roche_cold') {
+            document.getElementById('sched-roche-cold-col').style.display = 'flex';
+            document.getElementById('sched-roche-amb-col').style.display = 'none';
+        } else if (effectiveProject === 'roche_amb') {
+            document.getElementById('sched-roche-cold-col').style.display = 'none';
+            document.getElementById('sched-roche-amb-col').style.display = 'flex';
+        } else if (effectiveProject === 'roche') {
+            document.getElementById('sched-roche-cold-col').style.display = 'flex';
+            document.getElementById('sched-roche-amb-col').style.display = 'flex';
         }
 
-        let schedulerImgData = null; let schedulerRatio = 0;
+        // --- 1. 截图沙盘 ---
+        let schedulerImgData = null;
+        let schedulerRatio = 0;
         const modal = document.getElementById('scheduler-modal');
         const schedulerContent = document.getElementById('scheduler-capture-area');
+        
+        const wasVisible = modal.style.display === 'flex';
         const originalStyle = schedulerContent.style.cssText;
         modal.style.display = 'flex';
+        
+        // 克隆并应用宽屏样式
         schedulerContent.classList.add('pdf-mode-active'); 
-        schedulerContent.style.width = '1350px'; schedulerContent.style.height = 'auto';
-        schedulerContent.style.position = 'fixed'; schedulerContent.style.top = '-9999px'; schedulerContent.style.left = '0';
+        schedulerContent.style.width = '1350px'; 
+        schedulerContent.style.height = 'auto';
+        schedulerContent.style.position = 'fixed'; 
+        schedulerContent.style.top = '-9999px';
+        schedulerContent.style.left = '0';
         document.body.appendChild(schedulerContent);
         
+        // 插入报表头
         let titleName = document.getElementById('project-select').selectedOptions[0].text;
-        if (isCombined) titleName = "💊 罗诊联合版";
+        if (isCombined) titleName = "💊 罗诊 (冷库+常温联合版)";
 
         const headerDiv = document.createElement('div');
-        headerDiv.innerHTML = `<div style="padding: 40px 40px 10px 40px; background: #fff; text-align: center;"><div style="font-size: 32px; font-weight: bold; color: #2C3E50; margin-bottom: 15px;">人员排班详细沙盘</div><div style="font-size: 16px; color: #7F8C8D; border-bottom: 2px solid #BDC3C7; padding-bottom: 20px; display: flex; justify-content: center; gap: 40px;"><span>📅 执行日期: ${dateStr}</span><span>🏭 项目: ${titleName}</span></div></div>`;
+        headerDiv.innerHTML = `
+            <div style="padding: 40px 40px 10px 40px; background: #fff; text-align: center;">
+                <div style="font-size: 32px; font-weight: bold; color: #2C3E50; margin-bottom: 15px;">人员排班详细沙盘</div>
+                <div style="font-size: 16px; color: #7F8C8D; border-bottom: 2px solid #BDC3C7; padding-bottom: 20px; display: flex; justify-content: center; gap: 40px;">
+                    <span>📅 执行日期: ${dateStr}</span>
+                    <span>🏭 所属项目: ${titleName}</span>
+                </div>
+            </div>
+            <div style="padding: 10px 40px 30px 40px; background: #fff; color: #555; font-size: 14px; display: flex; justify-content: center; gap: 30px; align-items: center;">
+                <strong style="font-size:16px;">图例：</strong> 
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#3498db; margin-right:6px; border-radius:3px;"></span> 管理</span>
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#9b59b6; margin-right:6px; border-radius:3px;"></span> 文员</span>
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#27ae60; margin-right:6px; border-radius:3px;"></span> 一线员工</span>
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#f1c40f; margin-right:6px; border-radius:3px;"></span> 临时工</span>
+                <span style="display:flex; align-items:center; margin-left:10px;"><span style="width:16px; height:16px; background:#e74c3c; margin-right:6px; border-radius:3px;"></span> 缺口</span>
+            </div>
+        `;
         schedulerContent.insertBefore(headerDiv, schedulerContent.firstChild);
 
         try {
-            await new Promise(r => setTimeout(r, 400)); 
-            const canvas2 = await html2canvas(schedulerContent, { scale: 1.5, useCORS: true, backgroundColor: '#ffffff', windowWidth: 1650, height: schedulerContent.scrollHeight });
-            schedulerImgData = canvas2.toDataURL('image/png'); schedulerRatio = canvas2.height / canvas2.width;
-        } catch(e) { console.error(e); } 
+            await new Promise(r => setTimeout(r, 300)); 
+            
+            const canvas2 = await html2canvas(schedulerContent, { 
+                scale: 1.5, 
+                useCORS: true, 
+                backgroundColor: '#ffffff',
+                windowWidth: 1650,
+                height: schedulerContent.scrollHeight
+            });
+        
+            schedulerImgData = canvas2.toDataURL('image/png');
+            schedulerRatio = canvas2.height / canvas2.width;
+        } catch(e) { console.error("截图失败:", e); } 
         finally { 
-            schedulerContent.classList.remove('pdf-mode-active'); if(headerDiv.parentNode) headerDiv.parentNode.removeChild(headerDiv);
-            document.getElementById('scheduler-modal').appendChild(schedulerContent); schedulerContent.style.cssText = originalStyle;
-            modal.style.display = 'none';
+            schedulerContent.classList.remove('pdf-mode-active'); 
+            if(headerDiv.parentNode) headerDiv.parentNode.removeChild(headerDiv);
+            document.getElementById('scheduler-modal').appendChild(schedulerContent); 
+            schedulerContent.style.cssText = originalStyle;
+            schedulerContent.style.position = '';
+            schedulerContent.style.top = '';
+            schedulerContent.style.left = '';
+            if(!wasVisible) modal.style.display = 'none';
         }
 
-        const colorMap = { 'roche': ['#2C3E50', '#c0392b', '#2980b9'], 'roche_cold': ['#2C3E50', '#c0392b', '#77929F'], 'roche_amb': ['#5D5046', '#c0392b', '#D4C4B7'], 'device': ['#556B2F', '#c0392b', '#9CAF88'], 'medicine': ['#555', '#c0392b', '#95A5A6'] };
+        // --- 2. 构建第一页 ---
+        const colorMap = {
+            'roche': ['#2C3E50', '#c0392b', '#2980b9'], 
+            'roche_cold': ['#2C3E50', '#c0392b', '#77929F'], 
+            'roche_amb': ['#5D5046', '#c0392b', '#D4C4B7'], 
+            'device': ['#556B2F', '#c0392b', '#9CAF88'], 
+            'medicine': ['#555', '#c0392b', '#95A5A6']
+        };
         const theme = colorMap[effectiveProject] || colorMap['roche'];
         const getTxt = (id) => document.getElementById(id)?.innerText || '0';
         const getVal = (id) => document.getElementById(id)?.value || '0';
-        
-        let html = `<div class="pdf-header"><div class="pdf-title" style="color:${theme[0]}">${getTxt('page-title')} - 日报</div><div class="pdf-date">${dateStr}</div></div><div class="pdf-decision-row">`;
+        let html = `
+            <div class="pdf-header">
+                <div class="pdf-title" style="color:${theme[0]}">${getTxt('page-title')} - 日报</div>
+                <div class="pdf-date">${dateStr}</div>
+            </div>
+            <div class="pdf-decision-row">
+        `;
         if (effectiveProject === 'roche') {
-            html += `<div class="pdf-kpi-card" style="background:var(--roche-blue)"><div class="pdf-kpi-title">❄️ 冷库需求</div><div class="pdf-kpi-val">${getTxt('res_roche_cold')}</div><div class="pdf-kpi-sub">缺口: ${getTxt('gap_roche_cold')} H</div></div>`;
-            html += `<div class="pdf-kpi-card" style="background:var(--roche-sand)"><div class="pdf-kpi-title">☀️ 常温需求</div><div class="pdf-kpi-val">${getTxt('res_roche_amb')}</div><div class="pdf-kpi-sub">缺口: ${getTxt('gap_roche_amb')} H</div></div>`;
-        } else if (effectiveProject === 'roche_cold') { html += `<div class="pdf-kpi-card" style="background:var(--roche-blue)"><div class="pdf-kpi-title">❄️ 冷库需求</div><div class="pdf-kpi-val">${getTxt('res_roche_cold')}</div><div class="pdf-kpi-sub">缺口: ${getTxt('gap_roche_cold')} H</div></div>`; }
-        else if (effectiveProject === 'roche_amb') { html += `<div class="pdf-kpi-card" style="background:var(--roche-sand)"><div class="pdf-kpi-title">☀️ 常温需求</div><div class="pdf-kpi-val">${getTxt('res_roche_amb')}</div><div class="pdf-kpi-sub">缺口: ${getTxt('gap_roche_amb')} H</div></div>`; }
-        else if (effectiveProject === 'device') { html += `<div class="pdf-kpi-card" style="background:var(--device-green)"><div class="pdf-kpi-title">⚙️ 器械需求</div><div class="pdf-kpi-val">${getTxt('res_device')}</div><div class="pdf-kpi-sub">缺口: ${getTxt('gap_device')} H</div></div>`; }
-        else { html += `<div class="pdf-kpi-card" style="background:var(--medicine-purple)"><div class="pdf-kpi-title">🌿 药品需求</div><div class="pdf-kpi-val">${getTxt('res_medicine')}</div><div class="pdf-kpi-sub">缺口: ${getTxt('gap_medicine')} H</div></div>`; }
-        html += `<div class="pdf-kpi-card" style="background:#e74c3c"><div class="pdf-kpi-title">🏆 今日总需求</div><div class="pdf-kpi-val">${getTxt('res_total')}</div><div class="pdf-kpi-sub">班次: ${getTxt('res_shift')} H</div></div></div>`;
+            html += `<div class="pdf-kpi-card" style="background:var(--roche-blue)"><div class="pdf-kpi-title">❄️ 冷库需求</div><div class="pdf-kpi-val">${getTxt('res_roche_cold')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_roche_cold')} 小时</div></div>`;
+            html += `<div class="pdf-kpi-card" style="background:var(--roche-sand)"><div class="pdf-kpi-title">☀️ 常温需求</div><div class="pdf-kpi-val">${getTxt('res_roche_amb')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_roche_amb')} 小时</div></div>`;
+        } else if (effectiveProject === 'roche_cold') {
+            html += `<div class="pdf-kpi-card" style="background:var(--roche-blue)"><div class="pdf-kpi-title">❄️ 冷库需求</div><div class="pdf-kpi-val">${getTxt('res_roche_cold')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_roche_cold')} 小时</div></div>`;
+        } else if (effectiveProject === 'roche_amb') {
+            html += `<div class="pdf-kpi-card" style="background:var(--roche-sand)"><div class="pdf-kpi-title">☀️ 常温需求</div><div class="pdf-kpi-val">${getTxt('res_roche_amb')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_roche_amb')} 小时</div></div>`;
+        } else if (effectiveProject === 'device') {
+            html += `<div class="pdf-kpi-card" style="background:var(--device-green)"><div class="pdf-kpi-title">⚙️ 器械需求</div><div class="pdf-kpi-val">${getTxt('res_device')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_device')} 小时</div></div>`;
+        } else {
+            html += `<div class="pdf-kpi-card" style="background:var(--medicine-purple)"><div class="pdf-kpi-title">🌿 药品需求</div><div class="pdf-kpi-val">${getTxt('res_medicine')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_medicine')} 小时</div></div>`;
+        }
+        html += `<div class="pdf-kpi-card" style="background:#e74c3c"><div class="pdf-kpi-title">🏆 今日总需求</div><div class="pdf-kpi-val">${getTxt('res_total')}</div><div class="pdf-kpi-sub">班次时长: ${getTxt('res_shift')} 小时</div></div></div>`;
         
         let staffInfo = "";
-        if(effectiveProject === 'roche') { staffInfo = `❄️冷库(在${getVal('base_roche_cold')}/实${getVal('fc_roche_cold')})  ☀️常温(在${getVal('base_roche_amb')}/实${getVal('fc_roche_amb')})`; }
-        else if (effectiveProject === 'roche_cold') { staffInfo = `❄️冷库(在${getVal('base_roche_cold')}/实${getVal('fc_roche_cold')})`; }
-        else if (effectiveProject === 'roche_amb') { staffInfo = `☀️常温(在${getVal('base_roche_amb')}/实${getVal('fc_roche_amb')})`; }
-        else if (effectiveProject === 'device') { staffInfo = `⚙️器械(在${getVal('base_device')}/实${getVal('fc_device')})`; }
-        else { staffInfo = `🌿药品(在${getVal('base_medicine')}/实${getVal('fc_medicine')})`; }
-        html += `<div class="pdf-resource-bar"><div class="pdf-res-item">基础参数: <strong>Eff ${getVal('eff')} / OEE ${getVal('oee')}</strong></div><div class="pdf-res-item">人员现状: <strong>${staffInfo}</strong></div></div><div class="pdf-details-grid">`;
+        if(effectiveProject === 'roche') {
+            staffInfo = `❄️冷库(在${getVal('base_roche_cold')}/实${getVal('fc_roche_cold')})  ☀️常温(在${getVal('base_roche_amb')}/实${getVal('fc_roche_amb')})`;
+        } else if (effectiveProject === 'roche_cold') {
+            staffInfo = `❄️冷库(在${getVal('base_roche_cold')}/实${getVal('fc_roche_cold')})`;
+        } else if (effectiveProject === 'roche_amb') {
+            staffInfo = `☀️常温(在${getVal('base_roche_amb')}/实${getVal('fc_roche_amb')})`;
+        } else if (effectiveProject === 'device') {
+            staffInfo = `⚙️器械(在${getVal('base_device')}/实${getVal('fc_device')})`;
+        } else {
+            staffInfo = `🌿药品(在${getVal('base_medicine')}/实${getVal('fc_medicine')})`;
+        }
+        
+        html += `<div class="pdf-resource-bar"><div class="pdf-res-item">基础参数: <strong>效率系数 ${getVal('eff')} / 有效作业率 ${getVal('oee')}</strong></div><div class="pdf-res-item">正式工现状: <strong>${staffInfo}</strong></div></div><div class="pdf-details-grid">`;
+        
         const baseViewId = effectiveProject === 'roche' ? 'view-roche' : `view-${effectiveProject.split('_')[0]}`;
         const activeView = document.getElementById(baseViewId);
-        activeView.querySelectorAll('.col').forEach(col => {
+        const cols = activeView.querySelectorAll('.col');
+        
+        cols.forEach(col => {
+            // ★跳过被隐藏的列，确保独立PDF不带另一半的数据★
             if(col.classList.contains('hidden')) return;
+
             html += `<div class="pdf-grid-col">`;
             const sectionTitle = col.querySelector('div[style*="font-weight:bold"]').innerText;
             html += `<div class="pdf-col-title">${sectionTitle}</div>`;
@@ -1262,57 +1527,117 @@
                 const groupName = card.querySelector('h4').innerText;
                 let groupHtml = `<div class="pdf-task-group"><div class="pdf-group-name">${groupName}</div>`;
                 let hasItem = false;
-                card.querySelectorAll('.data-input').forEach(input => { if(parseInt(input.value) > 0) { hasItem = true; groupHtml += `<div class="pdf-task-item"><span class="pdf-task-name">${input.previousElementSibling.innerText}</span><span>${input.value}</span></div>`; } });
-                groupHtml += `</div>`; if(hasItem) html += groupHtml;
+                card.querySelectorAll('.data-input').forEach(input => {
+                    if(parseInt(input.value) > 0) {
+                        hasItem = true;
+                        groupHtml += `<div class="pdf-task-item"><span class="pdf-task-name">${input.previousElementSibling.innerText}</span><span>${input.value}</span></div>`;
+                    }
+                });
+                groupHtml += `</div>`;
+                if(hasItem) html += groupHtml;
             });
             html += `</div>`;
         });
-        html += `</div><div class="pdf-chart-section"><div class="pdf-chart-title">📈 人力分布推荐</div>${document.getElementById('chart-area').innerHTML}</div>`;
+        html += `</div><div class="pdf-chart-section"><div class="pdf-chart-title">📈 人力分布推荐 (人)</div>${document.getElementById('chart-area').innerHTML}</div>`;
         pdfContainer.innerHTML = html;
+        
         try {
-            const canvas1 = await html2canvas(pdfContainer, { scale: 2 }); const imgData1 = canvas1.toDataURL('image/png'); const pdf = new jsPDF('p', 'mm', 'a4'); const pageWidth = 210;
+            const canvas1 = await html2canvas(pdfContainer, { scale: 2 });
+            const imgData1 = canvas1.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pageWidth = 210;
             pdf.addImage(imgData1, 'PNG', 0, 0, pageWidth, canvas1.height * pageWidth / canvas1.width);
-            if (schedulerImgData) { pdf.addPage(); const contentWidth = 190; const contentHeight = schedulerRatio * contentWidth; pdf.addImage(schedulerImgData, 'PNG', 10, 10, contentWidth, contentHeight); }
-            pdf.save(`${isCombined ? "罗诊_联合" : titleName}_日报_${dateStr}.pdf`);
-        } catch (e) { console.error(e); } finally { if(msgEl) msgEl.style.display = 'none'; pdfContainer.innerHTML = ''; }
+            
+            if (schedulerImgData) {
+                pdf.addPage();
+                const contentWidth = 190;
+                const contentHeight = schedulerRatio * contentWidth;
+                pdf.addImage(schedulerImgData, 'PNG', 10, 10, contentWidth, contentHeight);
+            }
+            
+            const nameMap = {'roche': '罗诊_常温冷库联合版', 'roche_cold': '罗诊冷库', 'roche_amb': '罗诊常温', 'device': '器械', 'medicine': '药品'};
+            let saveName = isCombined ? "罗诊_常温冷库联合版" : nameMap[effectiveProject];
+            pdf.save(`${saveName}_人力日报_${dateStr}.pdf`);
+            
+        } catch (e) {
+            console.error(e);
+            alert("PDF 生成遇到错误，请重试。");
+        } finally {
+            if(msgEl) msgEl.style.display = 'none';
+            pdfContainer.innerHTML = ''; 
+        }
     }
 
+/* === V16.3 生成带排班数据的链接 (支持全量/纯净双模式) === */
     function generateLink(isFull = false) {
         const params = new URLSearchParams();
+        
+        // 1. 保存业务数据 (数字)
         document.querySelectorAll('input, select').forEach(el => {
             if (el.value != 0 && el.id) {
                 if (!isFull) {
-                    if (currentProject === 'roche_cold') { if (!el.closest('#view-roche-cold-col') && el.id !== 'shift_roche_cold') return; } 
-                    else if (currentProject === 'roche_amb') { if (!el.closest('#view-roche-amb-col') && el.id !== 'shift_roche_amb') return; } 
-                    else if (currentProject === 'device') { if (!el.closest('#view-device') && el.id !== 'shift_device') return; } 
-                    else if (currentProject === 'medicine') { if (!el.closest('#view-medicine') && el.id !== 'shift_medicine') return; }
+                    // ★ 核心排查修复点 2：纯净模式下精准拦截全局系数和外组数据 ★
+                    if (el.id === 'project-select') { /* 允许携带项目标识 */ }
+                    else if (currentProject === 'roche_cold') {
+                        if (!el.closest('#view-roche-cold-col') && el.id !== 'shift_roche_cold') return;
+                    } else if (currentProject === 'roche_amb') {
+                        if (!el.closest('#view-roche-amb-col') && el.id !== 'shift_roche_amb') return;
+                    } else if (currentProject === 'device') {
+                        if (!el.closest('#view-device') && el.id !== 'shift_device') return;
+                    } else if (currentProject === 'medicine') {
+                        if (!el.closest('#view-medicine') && el.id !== 'shift_medicine') return;
+                    } else {
+                        // 兜底拦截（拦截全局参数 eff, oee 等）
+                        return;
+                    }
                 }
                 params.set(el.id, el.value);
             }
         });
-        if (!isFull) params.set('pure_source', currentProject); 
+
+        // 2. 保存人员排班数据 (JSON -> 压缩编码)
         try {
             let dataToCompress = {};
-            if (isFull) dataToCompress = staffData;
-            else {
-                let zonesToInclude = []; 
-                if (currentProject === 'roche_cold') zonesToInclude = ['roche_cold_base', 'roche_cold_sup']; 
-                else if (currentProject === 'roche_amb') zonesToInclude = ['roche_amb_base', 'roche_amb_sup']; 
-                else if (currentProject === 'device') zonesToInclude = ['device_base', 'device_sup']; 
+            
+            if (isFull) {
+                // 全量模式：打包所有数据（包含所有组和资源池）
+                dataToCompress = staffData;
+            } else {
+                // 纯净模式：只打包当前界面的排班人员，绝不触碰资源池和其他组
+                let zonesToInclude = [];
+                if (currentProject === 'roche_cold') zonesToInclude = ['roche_cold_base', 'roche_cold_sup'];
+                else if (currentProject === 'roche_amb') zonesToInclude = ['roche_amb_base', 'roche_amb_sup'];
+                else if (currentProject === 'device') zonesToInclude = ['device_base', 'device_sup'];
                 else if (currentProject === 'medicine') zonesToInclude = ['medicine_base', 'medicine_sup'];
-                zonesToInclude.forEach(zone => { dataToCompress[zone] = staffData[zone]; });
+
+                zonesToInclude.forEach(zone => {
+                    dataToCompress[zone] = staffData[zone];
+                });
             }
-            const jsonStr = JSON.stringify(dataToCompress); const compressed = btoa(encodeURIComponent(jsonStr)); params.set('sdata', compressed);
-        } catch (e) { console.error(e); }
+
+            const jsonStr = JSON.stringify(dataToCompress);
+            const compressed = btoa(encodeURIComponent(jsonStr));
+            params.set('sdata', compressed);
+        } catch (e) {
+            console.error("排班数据编码失败", e);
+        }
+
         const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?" + params.toString();
+        
         navigator.clipboard.writeText(newUrl).then(() => {
-            const msgStr = isFull ? "✅ 全量链接已复制" : `✨ [${document.getElementById('project-select').selectedOptions[0].text}] 纯净链接已复制`;
-            document.getElementById('link-msg').innerText = msgStr; document.getElementById('link-msg').style.display = 'block';
+            // 动态提示文案
+            const msgStr = isFull ? "✅ 全量链接已复制 (包含所有历史数据)" : "✨ 纯净链接已复制 (只含当前组，不覆盖他人)";
+            document.getElementById('link-msg').innerText = msgStr;
+            document.getElementById('link-msg').style.display = 'block';
             setTimeout(() => { document.getElementById('link-msg').style.display = 'none'; }, 3000);
+        }).catch(err => {
+            alert("复制失败，可能是链接太长了");
         });
     }
 
-    document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', update));
+    document.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', update);
+    });
     window.onload = init;
 </script>
 
