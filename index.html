@@ -488,7 +488,7 @@
             margin-bottom: 10px; 
         }
 
-        /* === 排班沙盘样式 === */
+        /* === 排班沙盘样式 (V14.1 滚动条优化版) === */
         .scheduler-modal { 
             display: none; 
             position: fixed; 
@@ -549,95 +549,71 @@
         }
         
         .schedule-zone { 
-            background: #f8f9fa;
+            background: #f8f9fa; 
             border: 2px dashed #dcdfe6; 
             border-radius: 8px; 
             padding: 10px; 
             display: flex; 
-            flex-direction: column;
+            flex-direction: column; 
         }
         
-        /* 内部放小人的盒子：基础样式 */
+        /* 内部放小人的盒子：基础样式 (V15.4 修复版) */
         .zone-box { 
-            background: transparent;
-            border: none !important; 
-            display: flex;
+            background: transparent; 
+            border: none !important; /* ★ 修复：去掉内边框 */
+            display: flex; 
             flex-wrap: wrap; 
             gap: 8px; 
             align-content: flex-start; 
-            width: 100% !important;  
-            padding-right: 5px;
+            width: 100% !important;  /* ★ 修复：强制撑开 */
+            padding-right: 5px; 
         }
         
         /* 本组出勤 (淡紫色 + 大空间 + 滚动条) */
         .zone-base-container .schedule-zone { 
-            background: #f3e5f5;
-            border-color: #ce93d8; 
-            flex: 2; 
+            background: #f3e5f5; 
+            border-color: #ce93d8; flex: 2; 
         }
         .zone-base-container .zone-box {
-            min-height: 250px;
-            max-height: 450px; 
-            overflow-y: auto;
+            min-height: 250px; 
+            max-height: 450px; overflow-y: auto;
         }
 
         /* 支援人员 (淡橙色 + 较小空间) */
         .zone-sup-container .schedule-zone { 
-            background: #fff3e0;
-            border-color: #ffcc80; 
-            flex: 1; 
+            background: #fff3e0; 
+            border-color: #ffcc80; flex: 1; 
         }
         .zone-sup-container .zone-box {
-            min-height: 100px;
-            max-height: 150px; 
-            overflow-y: auto;
+            min-height: 100px; 
+            max-height: 150px; overflow-y: auto;
         }
 
         /* 缺口区域 */
         .zone-gap-container .schedule-zone {
-            background: #fff0f0;
-            border-color: #fadbd8; 
-            flex: 0 0 auto;
+            background: #fff0f0; 
+            border-color: #fadbd8; flex: 0 0 auto;
         }
         .zone-gap-container .zone-box {
-            min-height: 60px;
+            min-height: 60px; 
         }
 
         .zone-title { 
-            font-weight: bold; 
-            margin-bottom: 8px; 
-            font-size: 14px; 
-            display: flex; 
-            justify-content: space-between; 
-            color: #555; 
+            font-weight: bold; margin-bottom: 8px; font-size: 14px; display: flex; justify-content: space-between; color: #555; 
         }
         .zone-box::-webkit-scrollbar { 
             width: 6px; 
         }
         .zone-box::-webkit-scrollbar-thumb { 
-            background-color: #ccc; 
-            border-radius: 3px; 
+            background-color: #ccc; border-radius: 3px; 
         }
         
         /* 人员卡片 */
         .staff-card { 
-            padding: 4px 8px; 
-            border-radius: 4px; 
-            font-size: 12px; 
-            font-weight: bold; 
-            color: white; 
-            cursor: grab; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 5px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-            user-select: none; 
-            position: relative; 
-            height: 24px; 
+            padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; cursor: grab; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); user-select: none; position: relative; height: 24px; 
         }
         .staff-card:active { 
-            cursor: grabbing; 
-            transform: scale(1.05); 
+            cursor: grabbing; transform: scale(1.05); 
         }
         .staff-type-1 { background: #3498db; }
         .staff-type-2 { background: #9b59b6; }
@@ -645,65 +621,38 @@
         .staff-type-4 { background: #f1c40f; color: #333; }
         
         .staff-delete { 
-            display: none; 
-            width: 16px; 
-            height: 16px; 
-            background: rgba(0,0,0,0.2); 
-            border-radius: 50%; 
-            text-align: center; 
-            line-height: 14px; 
-            font-size: 10px; 
-            cursor: pointer; 
-            margin-left: 5px; 
+            display: none; width: 16px; height: 16px; background: rgba(0,0,0,0.2); border-radius: 50%; text-align: center; line-height: 14px; font-size: 10px; cursor: pointer; margin-left: 5px; 
         }
         .staff-card:hover .staff-delete { 
             display: inline-block; 
         }
         
         .gap-block { 
-            padding: 4px 8px; 
-            border-radius: 4px; 
-            font-size: 12px; 
-            font-weight: bold; 
-            color: white; 
-            background: #e74c3c; 
-            opacity: 0.8; 
-            border: 1px dashed white; 
-            cursor: not-allowed; 
+            padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; background: #e74c3c; opacity: 0.8; border: 1px dashed white; cursor: not-allowed; 
         }
         
         .add-staff-area { 
-            margin-bottom: 15px; 
-            padding-bottom: 15px; 
-            border-bottom: 1px solid #ccc; 
+            margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #ccc; 
         }
         .add-staff-area textarea { 
-            width: 100%; 
-            height: 60px; 
-            margin-bottom: 5px; 
-            font-size: 12px; 
-            padding: 5px; 
-            border-radius: 4px; 
-            border:1px solid #ccc; 
+            width: 100%; height: 60px; margin-bottom: 5px; font-size: 12px; padding: 5px; border-radius: 4px; border:1px solid #ccc; 
         }
         .type-radio { 
-            font-size: 12px; 
-            margin-right: 8px; 
-            cursor: pointer; 
+            font-size: 12px; margin-right: 8px; cursor: pointer; 
         }
 
         /* === 终极 PDF 报表样式 (宽屏截图适配) === */
         .pdf-mode-active {
-            display: block !important;
+            display: block !important; 
             background: white !important;
             box-shadow: none !important;
             border: none !important;
             padding: 0 !important;
             position: absolute !important;
             top: 0;
-            left: 0;
+            left: 0; 
             z-index: -9999;
-            min-width: 1280px !important; 
+            min-width: 1280px !important; /* 强制宽屏 */
         }
         
         /* 隐藏杂项 */
@@ -711,79 +660,75 @@
         .pdf-mode-active .add-staff-area,
         .pdf-mode-active .staff-delete,
         .pdf-mode-active .scheduler-content > button { 
-            display: none !important;
+            display: none !important; 
         }
 
         /* 主体容器：左右布局，撑满 */
         .pdf-mode-active .schedule-board {
-            width: 100% !important;
+            width: 100% !important; 
             padding: 20px 80px 20px 0px !important;
             margin: 0 !important;
             background: white !important;
             display: flex !important;
-            gap: 30px !important;
+            /* Flex 布局 */
+            gap: 30px !important; 
             align-items: flex-start !important;
         }
 
         .pdf-mode-active #sched-view-roche {
-            display: flex !important;
-            flex-direction: row !important; 
+            display: flex !important; 
+            flex-direction: row !important; /* 左右排列 */
             width: 100% !important;
             gap: 30px !important;
         }
 
         .pdf-mode-active .schedule-col {
-            flex: 1 !important;
+            flex: 1 !important; 
             border: none !important;
             padding: 0 !important;
             height: auto !important;
-            width: auto !important;
+            width: auto !important; 
         }
 
         /* 盒子全展开 */
         .pdf-mode-active .schedule-zone,
         .pdf-mode-active .zone-box {
-            max-height: none !important;
+            max-height: none !important; 
             min-height: 80px !important;
             overflow: visible !important;
             height: auto !important;
             display: flex !important;
             flex-wrap: wrap !important;
-            background: #fff !important;
+            background: #fff !important; 
             border: 1px solid #ddd !important;
             margin-bottom: 15px;
         }
 
         .pdf-mode-active .zone-gap-container {
-            display: block !important;
+            display: block !important; 
             height: auto !important;
         }
 
         .pdf-mode-active h3 {
-            color: #2c3e50 !important;
+            color: #2c3e50 !important; 
             border-bottom: 2px solid #7f8c8d;
             padding-bottom: 10px;
             margin-top: 0 !important;
             margin-bottom: 20px;
             font-size: 20px !important;
-            text-align: center;
+            text-align: center; 
         }
 
         @media print {
             body { 
                 height: auto; 
-                overflow: visible; 
-                display: block; 
+                overflow: visible; display: block; }
+            .sidebar, .btn { display: none; 
             }
-            .sidebar, .btn { 
-                display: none; 
+            .chart-container { break-inside: avoid; 
             }
-            .chart-container { 
-                break-inside: avoid; 
-            }
-            .main-content { 
-                height: auto; 
-                overflow: visible; 
+            .main-content { height: auto; 
+            overflow: visible; 
             }
         }
     </style>
@@ -962,360 +907,120 @@
         <div id="view-roche" class="columns view-roche">
             <div id="view-roche-cold-col" class="col">
                 <div style="background:var(--roche-blue); color:white; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold;">❄️ 罗诊冷库组</div>
-                <div class="card">
-                    <div class="card-header-cold"><h4>📦 罗诊冷库 (主营)</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>收货翻托/全检 (托)</label>
-                            <input type="number" class="data-input" data-uph="2.5" id="c_ft">
-                        </div>
-                        <div class="input-item">
-                            <label>收货上架 (条)</label>
-                            <input type="number" class="data-input" data-uph="20" id="c_sj">
-                        </div>
-                        <div class="input-item">
-                            <label>发货拣货 (条)</label>
-                            <input type="number" class="data-input" data-uph="20" id="c_jh">
-                        </div>
-                        <div class="input-item">
-                            <label>扫描包装 (盒)</label>
-                            <input type="number" class="data-input" data-uph="110" id="c_bz">
-                        </div>
-                        <div class="input-item">
-                            <label>拆小蓝箱 (个)</label>
-                            <input type="number" class="data-input" data-uph="13" id="c_lx">
-                        </div>
-                        <div class="input-item">
-                            <label>温度计下载 (个)</label>
-                            <input type="number" class="data-input" data-uph="30" id="c_lxx">
-                        </div>
-                    </div>
-                </div>
+                <div class="card"><div class="card-header-cold"><h4>📦 罗诊冷库 (主营)</h4></div><div class="input-grid">
+                    <div class="input-item"><label>收货翻托/全检 (托)</label><input type="number" class="data-input" data-uph="2.5" id="c_ft"></div>
+                    <div class="input-item"><label>收货上架 (条)</label><input type="number" class="data-input" data-uph="20" id="c_sj"></div>
+                    <div class="input-item"><label>发货拣货 (条)</label><input type="number" class="data-input" data-uph="20" id="c_jh"></div>
+                    <div class="input-item"><label>扫描包装 (盒)</label><input type="number" class="data-input" data-uph="110" id="c_bz"></div>
+                    <div class="input-item"><label>拆小蓝箱 (个)</label><input type="number" class="data-input" data-uph="13" id="c_lx"></div>
+                    <div class="input-item"><label>温度计下载 (个)</label><input type="number" class="data-input" data-uph="30" id="c_lxx"></div>
+                </div></div>
   
-                <div class="card">
-                    <div class="card-header-cold"><h4>🧊 安捷伦(冷库)</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>收货上架 (条)</label>
-                            <input type="number" class="data-input" data-uph="20" id="ag_sj">
-                        </div>
-                        <div class="input-item">
-                            <label>发货拣货 (条)</label>
-                            <input type="number" class="data-input" data-uph="20" id="ag_jh">
-                        </div>
-                        <div class="input-item">
-                            <label>扫描包装 (盒)</label>
-                            <input type="number" class="data-input" data-uph="75" id="ag_bz">
-                        </div>
-                    </div>
-                </div>
+                <div class="card"><div class="card-header-cold"><h4>🧊 安捷伦(冷库)</h4></div><div class="input-grid">
+                    <div class="input-item"><label>收货上架 (条)</label><input type="number" class="data-input" data-uph="20" id="ag_sj"></div>
+                    <div class="input-item"><label>发货拣货 (条)</label><input type="number" class="data-input" data-uph="20" id="ag_jh"></div>
+                    <div class="input-item"><label>扫描包装 (盒)</label><input type="number" class="data-input" data-uph="75" id="ag_bz"></div>
+                </div></div>
 
-                <div class="card">
-                    <div class="card-header-cold"><h4>🧊 豪洛捷(冷库)</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>收货上架 (条)</label>
-                            <input type="number" class="data-input" data-uph="20" id="ho_sj">
-                        </div>
-                        <div class="input-item">
-                            <label>发货拣货 (条)</label>
-                            <input type="number" class="data-input" data-uph="20" id="ho_jh">
-                        </div>
-                    </div>
-                </div>
+                <div class="card"><div class="card-header-cold"><h4>🧊 豪洛捷(冷库)</h4></div><div class="input-grid">
+                    <div class="input-item"><label>收货上架 (条)</label><input type="number" class="data-input" data-uph="20" id="ho_sj"></div>
+                    <div class="input-item"><label>发货拣货 (条)</label><input type="number" class="data-input" data-uph="20" id="ho_jh"></div>
+                </div></div>
 
-                <div class="card">
-                    <div class="card-header-cold"><h4>🧊 罗诊自营</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>收货上架 (条)</label>
-                            <input type="number" class="data-input" data-uph="20" id="se_sj">
-                        </div>
-                        <div class="input-item">
-                            <label>发货拣货 (条)</label>
-                            <input type="number" class="data-input" data-uph="20" id="se_jh">
-                        </div>
-                        <div class="input-item">
-                            <label>扫描包装 (盒)</label>
-                            <input type="number" class="data-input" data-uph="75" id="se_bz">
-                        </div>
-                    </div>
-                </div>
+                <div class="card"><div class="card-header-cold"><h4>🧊 罗诊自营</h4></div><div class="input-grid">
+                    <div class="input-item"><label>收货上架 (条)</label><input type="number" class="data-input" data-uph="20" id="se_sj"></div>
+                    <div class="input-item"><label>发货拣货 (条)</label><input type="number" class="data-input" data-uph="20" id="se_jh"></div>
+                    <div class="input-item"><label>扫描包装 (盒)</label><input type="number" class="data-input" data-uph="75" id="se_bz"></div>
+                </div></div>
 
-                <div class="card">
-                    <div class="card-header-cold"><h4>🔍 动态盘点</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>冷库盘点 (条)</label>
-                            <input type="number" class="data-input" data-uph="20" id="c_pd">
-                        </div>
-                    </div>
-                </div>
+                <div class="card"><div class="card-header-cold"><h4>🔍 动态盘点</h4></div><div class="input-grid">
+                    <div class="input-item"><label>冷库盘点 (条)</label><input type="number" class="data-input" data-uph="20" id="c_pd"></div>
+                </div></div>
             </div>
             
             <div id="view-roche-amb-col" class="col">
                 <div style="background:var(--roche-sand); color:#5D5046; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold;">☀️ 罗诊常温组</div>
-                <div class="card">
-                    <div class="card-header-amb"><h4>🧪 罗氏试剂</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>上架 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="r_sj">
-                        </div>
-                        <div class="input-item">
-                            <label>取货 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="r_qh">
-                        </div>
-                        <div class="input-item">
-                            <label>扫描包装 (盒)</label>
-                            <input type="number" class="data-input" data-uph="120" data-subtype="amb" id="r_bz">
-                        </div>
-                        <div class="input-item">
-                            <label>转储 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="r_zc">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header-amb"><h4>🔬 罗氏仪器</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>国内到货清点 (盒)</label>
-                            <input type="number" class="data-input" data-uph="80" data-subtype="amb" id="i_qd">
-                        </div>
-                        <div class="input-item">
-                            <label>上架 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="i_sj">
-                        </div>
-                        <div class="input-item">
-                            <label>取货 (条)</label>
-                            <input type="number" class="data-input" data-uph="10" data-subtype="amb" id="i_qh">
-                        </div>
-                        <div class="input-item">
-                            <label>扫描包装 (PC)</label>
-                            <input type="number" class="data-input" data-uph="50" data-subtype="amb" id="i_bz">
-                        </div>
-                        <div class="input-item">
-                            <label>转储 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="i_zc">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header-amb"><h4>📦 罗诊2方</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>到货清点 (PC)</label>
-                            <input type="number" class="data-input" data-uph="200" data-subtype="amb" id="p2_qd">
-                        </div>
-                        <div class="input-item">
-                            <label>上架 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="p2_sj">
-                        </div>
-                        <div class="input-item">
-                            <label>下架 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="p2_xj">
-                        </div>
-                        <div class="input-item">
-                            <label>包装 (PC)</label>
-                            <input type="number" class="data-input" data-uph="100" data-subtype="amb" id="p2_bz">
-                        </div>
-                        <div class="input-item">
-                            <label>转储 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="p2_zc">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header-amb"><h4>🦷 士卓曼</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>到货清点 (PC)</label>
-                            <input type="number" class="data-input" data-uph="200" data-subtype="amb" id="st_qd">
-                        </div>
-                        <div class="input-item">
-                            <label>上架 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="st_sj">
-                        </div>
-                        <div class="input-item">
-                            <label>下架 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="st_xj">
-                        </div>
-                        <div class="input-item">
-                            <label>包装 (PC)</label>
-                            <input type="number" class="data-input" data-uph="200" data-subtype="amb" id="st_bz">
-                        </div>
-                        <div class="input-item">
-                            <label>转储 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="st_zc">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header-amb"><h4>😷 防疫物资</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>到货清点 (PC)</label>
-                            <input type="number" class="data-input" data-uph="200" data-subtype="amb" id="fy_qd">
-                        </div>
-                        <div class="input-item">
-                            <label>上架 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="fy_sj">
-                        </div>
-                        <div class="input-item">
-                            <label>下架 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="fy_xj">
-                        </div>
-                        <div class="input-item">
-                            <label>包装 (PC)</label>
-                            <input type="number" class="data-input" data-uph="400" data-subtype="amb" id="fy_bz">
-                        </div>
-                        <div class="input-item">
-                            <label>转储 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="fy_zc">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header-amb"><h4>🏥 迈瑞</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>到货清点 (PC)</label>
-                            <input type="number" class="data-input" data-uph="100" data-subtype="amb" id="mr_qd">
-                        </div>
-                        <div class="input-item">
-                            <label>上架 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="mr_sj">
-                        </div>
-                        <div class="input-item">
-                            <label>下架 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="mr_xj">
-                        </div>
-                        <div class="input-item">
-                            <label>包装 (PC)</label>
-                            <input type="number" class="data-input" data-uph="100" data-subtype="amb" id="mr_bz">
-                        </div>
-                        <div class="input-item">
-                            <label>转储 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="mr_zc">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header-amb"><h4>🔄 其他</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>常温退货 (条)</label>
-                            <input type="number" class="data-input" data-uph="2" data-subtype="amb" id="oth_th">
-                        </div>
-                        <div class="input-item">
-                            <label>常温盘点 (条)</label>
-                            <input type="number" class="data-input" data-uph="13" data-subtype="amb" id="oth_pd">
-                        </div>
-                    </div>
-                </div>
+                <div class="card"><div class="card-header-amb"><h4>🧪 罗氏试剂</h4></div><div class="input-grid">
+                    <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="r_sj"></div>
+                    <div class="input-item"><label>取货 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="r_qh"></div>
+                    <div class="input-item"><label>扫描包装 (盒)</label><input type="number" class="data-input" data-uph="120" data-subtype="amb" id="r_bz"></div>
+                    <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="r_zc"></div>
+                </div></div>
+                <div class="card"><div class="card-header-amb"><h4>🔬 罗氏仪器</h4></div><div class="input-grid">
+                    <div class="input-item"><label>国内到货清点 (盒)</label><input type="number" class="data-input" data-uph="80" data-subtype="amb" id="i_qd"></div>
+                    <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="i_sj"></div>
+                    <div class="input-item"><label>取货 (条)</label><input type="number" class="data-input" data-uph="10" data-subtype="amb" id="i_qh"></div>
+                    <div class="input-item"><label>扫描包装 (PC)</label><input type="number" class="data-input" data-uph="50" data-subtype="amb" id="i_bz"></div>
+                    <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="i_zc"></div>
+                </div></div>
+                <div class="card"><div class="card-header-amb"><h4>📦 罗诊2方</h4></div><div class="input-grid">
+                    <div class="input-item"><label>到货清点 (PC)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="p2_qd"></div>
+                    <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="p2_sj"></div>
+                    <div class="input-item"><label>下架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="p2_xj"></div>
+                    <div class="input-item"><label>包装 (PC)</label><input type="number" class="data-input" data-uph="100" data-subtype="amb" id="p2_bz"></div>
+                    <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="p2_zc"></div>
+                </div></div>
+                <div class="card"><div class="card-header-amb"><h4>🦷 士卓曼</h4></div><div class="input-grid">
+                    <div class="input-item"><label>到货清点 (PC)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="st_qd"></div>
+                    <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="st_sj"></div>
+                    <div class="input-item"><label>下架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="st_xj"></div>
+                    <div class="input-item"><label>包装 (PC)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="st_bz"></div>
+                    <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="st_zc"></div>
+                </div></div>
+                <div class="card"><div class="card-header-amb"><h4>😷 防疫物资</h4></div><div class="input-grid">
+                    <div class="input-item"><label>到货清点 (PC)</label><input type="number" class="data-input" data-uph="200" data-subtype="amb" id="fy_qd"></div>
+                    <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="fy_sj"></div>
+                    <div class="input-item"><label>下架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="fy_xj"></div>
+                    <div class="input-item"><label>包装 (PC)</label><input type="number" class="data-input" data-uph="400" data-subtype="amb" id="fy_bz"></div>
+                    <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="fy_zc"></div>
+                </div></div>
+                <div class="card"><div class="card-header-amb"><h4>🏥 迈瑞</h4></div><div class="input-grid">
+                    <div class="input-item"><label>到货清点 (PC)</label><input type="number" class="data-input" data-uph="100" data-subtype="amb" id="mr_qd"></div>
+                    <div class="input-item"><label>上架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="mr_sj"></div>
+                    <div class="input-item"><label>下架 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="mr_xj"></div>
+                    <div class="input-item"><label>包装 (PC)</label><input type="number" class="data-input" data-uph="100" data-subtype="amb" id="mr_bz"></div>
+                    <div class="input-item"><label>转储 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="mr_zc"></div>
+                </div></div>
+                <div class="card"><div class="card-header-amb"><h4>🔄 其他</h4></div><div class="input-grid">
+                    <div class="input-item"><label>常温退货 (条)</label><input type="number" class="data-input" data-uph="2" data-subtype="amb" id="oth_th"></div>
+                    <div class="input-item"><label>常温盘点 (条)</label><input type="number" class="data-input" data-uph="13" data-subtype="amb" id="oth_pd"></div>
+                </div></div>
             </div>
         </div>
 
         <div id="view-device" class="columns view-device hidden">
             <div class="col">
                 <div style="background:var(--device-green); color:white; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold;">⚙️ 器械项目组</div>
-                <div class="card">
-                    <div class="card-header"><h4>🔩 专项操作 (SP专项/墨尼克/锐适)</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>SP到货清点 (PC)</label>
-                            <input type="number" class="data-input device-input" data-uph="200" id="d_sp_qd">
-                        </div>
-                        <div class="input-item">
-                            <label>墨尼克翻托 (托)</label>
-                            <input type="number" class="data-input device-input" data-uph="20" id="d_mnk_ft">
-                        </div>
-                        <div class="input-item">
-                            <label>墨尼克包装 (盒)</label>
-                            <input type="number" class="data-input device-input" data-uph="50" id="d_mnk_bz">
-                        </div>
-                        <div class="input-item">
-                            <label>锐适BOM (盒)</label>
-                            <input type="number" class="data-input device-input" data-uph="50" id="d_rs_bom">
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header"><h4>🛠️ 器械通用操作</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>收货上架 (条)</label>
-                            <input type="number" class="data-input device-input" data-uph="15" id="d_sj">
-                        </div>
-                        <div class="input-item">
-                            <label>发货下架 (条)</label>
-                            <input type="number" class="data-input device-input" data-uph="15" id="d_xj">
-                        </div>
-                        <div class="input-item">
-                            <label>扫描包装 (盒)</label>
-                            <input type="number" class="data-input device-input" data-uph="50" id="d_bz">
-                        </div>
-                        <div class="input-item">
-                            <label>贴标 (盒)</label>
-                            <input type="number" class="data-input device-input" data-uph="100" id="d_tb">
-                        </div>
-                    </div>
-                </div>
+                <div class="card"><div class="card-header"><h4>🔩 专项操作 (SP专项/墨尼克/锐适)</h4></div><div class="input-grid">
+                    <div class="input-item"><label>SP到货清点 (PC)</label><input type="number" class="data-input device-input" data-uph="200" id="d_sp_qd"></div>
+                    <div class="input-item"><label>墨尼克翻托 (托)</label><input type="number" class="data-input device-input" data-uph="20" id="d_mnk_ft"></div>
+                    <div class="input-item"><label>墨尼克包装 (盒)</label><input type="number" class="data-input device-input" data-uph="50" id="d_mnk_bz"></div>
+                    <div class="input-item"><label>锐适组合件 (盒)</label><input type="number" class="data-input device-input" data-uph="50" id="d_rs_bom"></div>
+                </div></div>
+                <div class="card"><div class="card-header"><h4>🛠️ 器械通用操作</h4></div><div class="input-grid">
+                    <div class="input-item"><label>收货上架 (条)</label><input type="number" class="data-input device-input" data-uph="15" id="d_sj"></div>
+                    <div class="input-item"><label>发货下架 (条)</label><input type="number" class="data-input device-input" data-uph="15" id="d_xj"></div>
+                    <div class="input-item"><label>扫描包装 (盒)</label><input type="number" class="data-input device-input" data-uph="50" id="d_bz"></div>
+                    <div class="input-item"><label>贴标 (盒)</label><input type="number" class="data-input device-input" data-uph="100" id="d_tb"></div>
+                </div></div>
             </div>
         </div>
 
         <div id="view-medicine" class="columns view-medicine hidden">
             <div class="col">
                 <div style="background:var(--medicine-purple); color:white; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold;">🌿 药品项目组</div>
-                <div class="card">
-                    <div class="card-header"><h4>💊 药品基础作业</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>收货上架 (条)</label>
-                            <input type="number" class="data-input medicine-input" data-uph="12" id="p_sj">
-                        </div>
-                        <div class="input-item">
-                            <label>发货下架 (条)</label>
-                            <input type="number" class="data-input medicine-input" data-uph="12" id="p_xj">
-                        </div>
-                        <div class="input-item">
-                            <label>扫描包装 (条)</label>
-                            <input type="number" class="data-input medicine-input" data-uph="7" id="p_bz">
-                        </div>
-                        <div class="input-item">
-                            <label>贴标 (盒)</label>
-                            <input type="number" class="data-input medicine-input" data-uph="200" id="p_tb">
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header"><h4>🏗️ 药品专项作业</h4></div>
-                    <div class="input-grid">
-                        <div class="input-item">
-                            <label>罗贸&罗药翻托 (托)</label>
-                            <input type="number" class="data-input medicine-input" data-uph="1" id="p_ft">
-                        </div>
-                        <div class="input-item">
-                            <label>豪洛捷收货 (条)</label>
-                            <input type="number" class="data-input medicine-input" data-uph="10" id="p_hlj_sh">
-                        </div>
-                        <div class="input-item">
-                            <label>豪洛捷打标签 (个)</label>
-                            <input type="number" class="data-input medicine-input" data-uph="3500" id="p_hlj_tb">
-                        </div>
-                        <div class="input-item">
-                            <label>电商分包 (套)</label>
-                            <input type="number" class="data-input medicine-input" data-uph="45" id="p_ds">
-                        </div>
-                    </div>
-                </div>
+                <div class="card"><div class="card-header"><h4>💊 药品基础作业</h4></div><div class="input-grid">
+                    <div class="input-item"><label>收货上架 (条)</label><input type="number" class="data-input medicine-input" data-uph="12" id="p_sj"></div>
+                    <div class="input-item"><label>发货下架 (条)</label><input type="number" class="data-input medicine-input" data-uph="12" id="p_xj"></div>
+                    <div class="input-item"><label>扫描包装 (条)</label><input type="number" class="data-input medicine-input" data-uph="7" id="p_bz"></div>
+                    <div class="input-item"><label>贴标 (盒)</label><input type="number" class="data-input medicine-input" data-uph="200" id="p_tb"></div>
+                </div></div>
+                <div class="card"><div class="card-header"><h4>🏗️ 药品专项作业</h4></div><div class="input-grid">
+                    <div class="input-item"><label>罗贸&罗药翻托 (托)</label><input type="number" class="data-input medicine-input" data-uph="1" id="p_ft"></div>
+                    <div class="input-item"><label>豪洛捷收货 (条)</label><input type="number" class="data-input medicine-input" data-uph="10" id="p_hlj_sh"></div>
+                    <div class="input-item"><label>豪洛捷打标签 (个)</label><input type="number" class="data-input medicine-input" data-uph="3500" id="p_hlj_tb"></div>
+                    <div class="input-item"><label>电商分包 (套)</label><input type="number" class="data-input medicine-input" data-uph="45" id="p_ds"></div>
+                </div></div>
              </div>
         </div>
 
@@ -1871,7 +1576,6 @@
     }
 
     function loadStaffData() {
-        // ★ 启用 v8 新存档，避免与老数据格式冲突 ★
         const stored = localStorage.getItem('staffData_v8');
         if (stored) { 
             try { 
@@ -1909,7 +1613,6 @@
         const poolEl = document.getElementById('pool-container');
         poolEl.innerHTML = '';
         
-        // ★ 仅渲染属于当前组的专属池子 ★
         let currentPoolKey = 'pool_' + currentProject;
         if (currentProject === 'roche') currentPoolKey = 'pool_roche_cold';
         
@@ -2058,6 +1761,7 @@
         });
     }
 
+    /* === V16.5 联合版 PDF 魔法实现 === */
     async function generateCombinedPDF() {
         document.getElementById('formal-roche-cold-group').classList.remove('hidden');
         document.getElementById('dash-roche-cold-card').classList.remove('hidden');
@@ -2078,66 +1782,198 @@
         switchView();
     }
 
+    /* === V16.5 PDF生成 (完美恢复版) === */
     async function generatePDF(isCombined = false) {
         const { jsPDF } = window.jspdf;
-        const msg = document.getElementById('pdf-msg');
-        msg.style.display = 'block';
-        
-        let target = isCombined ? 'roche' : currentProject;
-        const colC = document.getElementById('sched-roche-cold-col');
-        const colA = document.getElementById('sched-roche-amb-col');
-        
-        // ★ 修复 2：截图前强制预画一次沙盘卡片，彻底解决截图空白问题
+        const pdfContainer = document.getElementById('pdf-container');
+        const msgEl = document.getElementById('pdf-msg');
+        if(msgEl) msgEl.style.display = 'block';
+
+        let effectiveProject = isCombined ? 'roche' : currentProject;
+
+        // ★ 核心排查修复点 1：强制预渲染沙盘以生成小人卡片，解决截图空白问题 ★
         renderScheduler();
-        
-        if (!isCombined) {
-            if (target === 'roche_cold') { 
-                colC.style.display = 'flex'; 
-                colA.style.display = 'none'; 
-            } else if (target === 'roche_amb') { 
-                colC.style.display = 'none'; 
-                colA.style.display = 'flex'; 
-            }
+
+        // 【★ 核心修复：单独生成PDF时，强制隐藏另一个组的排班沙盘列 ★】
+        if (effectiveProject === 'roche_cold') {
+            document.getElementById('sched-roche-cold-col').style.display = 'flex';
+            document.getElementById('sched-roche-amb-col').style.display = 'none';
+        } else if (effectiveProject === 'roche_amb') {
+            document.getElementById('sched-roche-cold-col').style.display = 'none';
+            document.getElementById('sched-roche-amb-col').style.display = 'flex';
+        } else if (effectiveProject === 'roche') {
+            document.getElementById('sched-roche-cold-col').style.display = 'flex';
+            document.getElementById('sched-roche-amb-col').style.display = 'flex';
         }
 
+        // --- 1. 截图沙盘 ---
+        let schedulerImgData = null;
+        let schedulerRatio = 0;
         const modal = document.getElementById('scheduler-modal');
-        const content = document.getElementById('scheduler-capture-area');
-        const oldStyle = content.style.cssText;
+        const schedulerContent = document.getElementById('scheduler-capture-area');
+        
+        const wasVisible = modal.style.display === 'flex';
+        const originalStyle = schedulerContent.style.cssText;
         modal.style.display = 'flex';
-        content.classList.add('pdf-mode-active');
-        content.style.width = '1300px'; 
-        content.style.height = 'auto'; 
-        content.style.position = 'fixed'; 
-        content.style.top = '-9999px';
-        document.body.appendChild(content);
+        
+        // 克隆并应用宽屏样式
+        schedulerContent.classList.add('pdf-mode-active'); 
+        schedulerContent.style.width = '1350px'; 
+        schedulerContent.style.height = 'auto';
+        schedulerContent.style.position = 'fixed'; 
+        schedulerContent.style.top = '-9999px';
+        schedulerContent.style.left = '0';
+        document.body.appendChild(schedulerContent);
+        
+        // 插入报表头
+        let titleName = document.getElementById('project-select').selectedOptions[0].text;
+        if (isCombined) titleName = "💊 罗诊 (冷库+常温联合版)";
+
+        const headerDiv = document.createElement('div');
+        headerDiv.innerHTML = `
+            <div style="padding: 40px 40px 10px 40px; background: #fff; text-align: center;">
+                <div style="font-size: 32px; font-weight: bold; color: #2C3E50; margin-bottom: 15px;">人员排班详细沙盘</div>
+                <div style="font-size: 16px; color: #7F8C8D; border-bottom: 2px solid #BDC3C7; padding-bottom: 20px; display: flex; justify-content: center; gap: 40px;">
+                    <span>📅 执行日期: ${dateStr}</span>
+                    <span>🏭 所属项目: ${titleName}</span>
+                </div>
+            </div>
+            <div style="padding: 10px 40px 30px 40px; background: #fff; color: #555; font-size: 14px; display: flex; justify-content: center; gap: 30px; align-items: center;">
+                <strong style="font-size:16px;">图例：</strong> 
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#3498db; margin-right:6px; border-radius:3px;"></span> 管理</span>
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#9b59b6; margin-right:6px; border-radius:3px;"></span> 文员</span>
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#27ae60; margin-right:6px; border-radius:3px;"></span> 一线员工</span>
+                <span style="display:flex; align-items:center;"><span style="width:16px; height:16px; background:#f1c40f; margin-right:6px; border-radius:3px;"></span> 临时工</span>
+                <span style="display:flex; align-items:center; margin-left:10px;"><span style="width:16px; height:16px; background:#e74c3c; margin-right:6px; border-radius:3px;"></span> 缺口</span>
+            </div>
+        `;
+        schedulerContent.insertBefore(headerDiv, schedulerContent.firstChild);
 
         try {
-            await new Promise(r => setTimeout(r, 400));
-            const canvasS = await html2canvas(content, { 
+            await new Promise(r => setTimeout(r, 300)); 
+            
+            const canvas2 = await html2canvas(schedulerContent, { 
                 scale: 1.5, 
                 useCORS: true, 
-                backgroundColor: '#ffffff', 
-                windowWidth: 1600 
+                backgroundColor: '#ffffff',
+                windowWidth: 1650,
+                height: schedulerContent.scrollHeight
             });
-            const imgS = canvasS.toDataURL('image/png');
-            
-            const pCon = document.getElementById('pdf-container');
-            let html = `<div class="pdf-header"><div class="pdf-title">${document.getElementById('page-title').innerText}</div><div class="pdf-date">${dateStr}</div></div>`;
-            pCon.innerHTML = html + "（报表生成中...）"; 
-            
+        
+            schedulerImgData = canvas2.toDataURL('image/png');
+            schedulerRatio = canvas2.height / canvas2.width;
+        } catch(e) { console.error("截图失败:", e); } 
+        finally { 
+            schedulerContent.classList.remove('pdf-mode-active'); 
+            if(headerDiv.parentNode) headerDiv.parentNode.removeChild(headerDiv);
+            document.getElementById('scheduler-modal').appendChild(schedulerContent); 
+            schedulerContent.style.cssText = originalStyle;
+            schedulerContent.style.position = '';
+            schedulerContent.style.top = '';
+            schedulerContent.style.left = '';
+            if(!wasVisible) modal.style.display = 'none';
+        }
+
+        // --- 2. 构建第一页 ---
+        const colorMap = {
+            'roche': ['#2C3E50', '#c0392b', '#2980b9'], 
+            'roche_cold': ['#2C3E50', '#c0392b', '#77929F'], 
+            'roche_amb': ['#5D5046', '#c0392b', '#D4C4B7'], 
+            'device': ['#556B2F', '#c0392b', '#9CAF88'], 
+            'medicine': ['#555', '#c0392b', '#95A5A6']
+        };
+        const theme = colorMap[effectiveProject] || colorMap['roche'];
+        const getTxt = (id) => document.getElementById(id)?.innerText || '0';
+        const getVal = (id) => document.getElementById(id)?.value || '0';
+        let html = `
+            <div class="pdf-header">
+                <div class="pdf-title" style="color:${theme[0]}">${getTxt('page-title')} - 日报</div>
+                <div class="pdf-date">${dateStr}</div>
+            </div>
+            <div class="pdf-decision-row">
+        `;
+        if (effectiveProject === 'roche') {
+            html += `<div class="pdf-kpi-card" style="background:var(--roche-blue)"><div class="pdf-kpi-title">❄️ 冷库需求</div><div class="pdf-kpi-val">${getTxt('res_roche_cold')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_roche_cold')} 小时</div></div>`;
+            html += `<div class="pdf-kpi-card" style="background:var(--roche-sand)"><div class="pdf-kpi-title">☀️ 常温需求</div><div class="pdf-kpi-val">${getTxt('res_roche_amb')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_roche_amb')} 小时</div></div>`;
+        } else if (effectiveProject === 'roche_cold') {
+            html += `<div class="pdf-kpi-card" style="background:var(--roche-blue)"><div class="pdf-kpi-title">❄️ 冷库需求</div><div class="pdf-kpi-val">${getTxt('res_roche_cold')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_roche_cold')} 小时</div></div>`;
+        } else if (effectiveProject === 'roche_amb') {
+            html += `<div class="pdf-kpi-card" style="background:var(--roche-sand)"><div class="pdf-kpi-title">☀️ 常温需求</div><div class="pdf-kpi-val">${getTxt('res_roche_amb')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_roche_amb')} 小时</div></div>`;
+        } else if (effectiveProject === 'device') {
+            html += `<div class="pdf-kpi-card" style="background:var(--device-green)"><div class="pdf-kpi-title">⚙️ 器械需求</div><div class="pdf-kpi-val">${getTxt('res_device')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_device')} 小时</div></div>`;
+        } else {
+            html += `<div class="pdf-kpi-card" style="background:var(--medicine-purple)"><div class="pdf-kpi-title">🌿 药品需求</div><div class="pdf-kpi-val">${getTxt('res_medicine')}</div><div class="pdf-kpi-sub">缺口工时: ${getTxt('gap_medicine')} 小时</div></div>`;
+        }
+        html += `<div class="pdf-kpi-card" style="background:#e74c3c"><div class="pdf-kpi-title">🏆 今日总需求</div><div class="pdf-kpi-val">${getTxt('res_total')}</div><div class="pdf-kpi-sub">班次时长: ${getTxt('res_shift')} 小时</div></div></div>`;
+        
+        let staffInfo = "";
+        if(effectiveProject === 'roche') {
+            staffInfo = `❄️冷库(在${getVal('base_roche_cold')}/实${getVal('fc_roche_cold')})  ☀️常温(在${getVal('base_roche_amb')}/实${getVal('fc_roche_amb')})`;
+        } else if (effectiveProject === 'roche_cold') {
+            staffInfo = `❄️冷库(在${getVal('base_roche_cold')}/实${getVal('fc_roche_cold')})`;
+        } else if (effectiveProject === 'roche_amb') {
+            staffInfo = `☀️常温(在${getVal('base_roche_amb')}/实${getVal('fc_roche_amb')})`;
+        } else if (effectiveProject === 'device') {
+            staffInfo = `⚙️器械(在${getVal('base_device')}/实${getVal('fc_device')})`;
+        } else {
+            staffInfo = `🌿药品(在${getVal('base_medicine')}/实${getVal('fc_medicine')})`;
+        }
+        
+        html += `<div class="pdf-resource-bar"><div class="pdf-res-item">基础参数: <strong>效率系数 ${getVal('eff')} / 有效作业率 ${getVal('oee')}</strong></div><div class="pdf-res-item">正式工现状: <strong>${staffInfo}</strong></div></div><div class="pdf-details-grid">`;
+        
+        const baseViewId = effectiveProject === 'roche' ? 'view-roche' : `view-${effectiveProject.split('_')[0]}`;
+        const activeView = document.getElementById(baseViewId);
+        const cols = activeView.querySelectorAll('.col');
+        
+        cols.forEach(col => {
+            // ★跳过被隐藏的列，确保独立PDF不带另一半的数据★
+            if(col.classList.contains('hidden')) return;
+
+            html += `<div class="pdf-grid-col">`;
+            const sectionTitle = col.querySelector('div[style*="font-weight:bold"]').innerText;
+            html += `<div class="pdf-col-title">${sectionTitle}</div>`;
+            col.querySelectorAll('.card').forEach(card => {
+                const groupName = card.querySelector('h4').innerText;
+                let groupHtml = `<div class="pdf-task-group"><div class="pdf-group-name">${groupName}</div>`;
+                let hasItem = false;
+                card.querySelectorAll('.data-input').forEach(input => {
+                    if(parseInt(input.value) > 0) {
+                        hasItem = true;
+                        groupHtml += `<div class="pdf-task-item"><span class="pdf-task-name">${input.previousElementSibling.innerText}</span><span>${input.value}</span></div>`;
+                    }
+                });
+                groupHtml += `</div>`;
+                if(hasItem) html += groupHtml;
+            });
+            html += `</div>`;
+        });
+        html += `</div><div class="pdf-chart-section"><div class="pdf-chart-title">📈 人力分布推荐 (人)</div>${document.getElementById('chart-area').innerHTML}</div>`;
+        pdfContainer.innerHTML = html;
+        
+        try {
+            const canvas1 = await html2canvas(pdfContainer, { scale: 2 });
+            const imgData1 = canvas1.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
-            pdf.text(isCombined ? "罗诊联合版日报" : "人力决策日报", 10, 10);
-            pdf.addPage();
-            pdf.addImage(imgS, 'PNG', 10, 10, 190, (canvasS.height * 190) / canvasS.width);
-            pdf.save(`${isCombined ? '罗诊联合' : '单组'}_日报_${dateStr}.pdf`);
-        } catch(e) { 
-            console.error(e); 
+            const pageWidth = 210;
+            pdf.addImage(imgData1, 'PNG', 0, 0, pageWidth, canvas1.height * pageWidth / canvas1.width);
+            
+            if (schedulerImgData) {
+                pdf.addPage();
+                const contentWidth = 190;
+                const contentHeight = schedulerRatio * contentWidth;
+                pdf.addImage(schedulerImgData, 'PNG', 10, 10, contentWidth, contentHeight);
+            }
+            
+            const nameMap = {'roche': '罗诊_常温冷库联合版', 'roche_cold': '罗诊冷库', 'roche_amb': '罗诊常温', 'device': '器械', 'medicine': '药品'};
+            let saveName = isCombined ? "罗诊_常温冷库联合版" : nameMap[effectiveProject];
+            pdf.save(`${saveName}_人力日报_${dateStr}.pdf`);
+            
+        } catch (e) {
+            console.error(e);
+            alert("PDF 生成遇到错误，请重试。");
         } finally {
-            content.classList.remove('pdf-mode-active');
-            document.getElementById('scheduler-modal').appendChild(content);
-            content.style.cssText = oldStyle;
-            modal.style.display = 'none';
-            msg.style.display = 'none';
+            if(msgEl) msgEl.style.display = 'none';
+            pdfContainer.innerHTML = ''; 
         }
     }
 
